@@ -1,6 +1,5 @@
 package com.eljaviluki.grindrplus;
 
-
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
@@ -16,17 +15,19 @@ public class GrindrHooker implements IXposedHookLoadPackage {
         if (!lpparam.packageName.equals(GRINDR_PKG))
             return;
 
-        String className;
+        {
+            Class<?> class_Feature = XposedHelpers.findClass(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
+            XposedHelpers.findAndHookMethod(class_Feature, "isGranted", RETURN_TRUE);
+            XposedHelpers.findAndHookMethod(class_Feature, "isNotGranted", RETURN_FALSE);
+        }
 
-        className = GRINDR_PKG + ".model.Feature";
-        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "isGranted", RETURN_TRUE);
-        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "isNotGranted", RETURN_FALSE);
-
-        className = GRINDR_PKG + ".model.BaseUserSession";
-        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "isFreeUser", RETURN_FALSE);
-        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "isPaidUser", RETURN_TRUE);
-        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "isXtra", RETURN_TRUE);
-        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "isNoXtraUpsell", RETURN_TRUE); //Not sure about what's this.
-        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "isUnlimited", RETURN_TRUE);
+        {
+            Class<?> class_BaseUserSession = XposedHelpers.findClass(GRINDR_PKG + ".base.model.BaseUserSession", lpparam.classLoader);
+            XposedHelpers.findAndHookMethod(class_BaseUserSession, "isFreeUser", RETURN_FALSE);
+            XposedHelpers.findAndHookMethod(class_BaseUserSession, "isPaidUser", RETURN_TRUE);
+            XposedHelpers.findAndHookMethod(class_BaseUserSession, "isXtra", RETURN_TRUE);
+            XposedHelpers.findAndHookMethod(class_BaseUserSession, "isNoXtraUpsell", RETURN_TRUE); //Not sure about what's this.
+            XposedHelpers.findAndHookMethod(class_BaseUserSession, "isUnlimited", RETURN_TRUE);
+        }
     }
 }
