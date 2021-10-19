@@ -29,5 +29,15 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             XposedHelpers.findAndHookMethod(class_BaseUserSession, "isNoXtraUpsell", RETURN_TRUE); //Not sure about what's this.
             XposedHelpers.findAndHookMethod(class_BaseUserSession, "isUnlimited", RETURN_TRUE);
         }
+
+        /*
+            Allow Fake GPS in order to fake location.
+
+            WARNING: Abusing this feature may result in a permanent ban on your Grindr account.
+         */
+        {
+            Class<?> class_Location = XposedHelpers.findClass("android.location.Location", lpparam.classLoader);
+            XposedHelpers.findAndHookMethod(class_Location, "isFromMockProvider", RETURN_FALSE);
+        }
     }
 }
