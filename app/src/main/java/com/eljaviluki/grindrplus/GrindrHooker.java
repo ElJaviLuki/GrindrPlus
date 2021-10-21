@@ -39,5 +39,21 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             Class<?> class_Location = XposedHelpers.findClass("android.location.Location", lpparam.classLoader);
             XposedHelpers.findAndHookMethod(class_Location, "isFromMockProvider", RETURN_FALSE);
         }
+
+        /*
+            Allow videocalls on empty chats: Grindr checks that both users have chatted with each other
+            (both must have sent at least one message to the other) in order to allow videocalls.
+
+            This hook allows the user to bypass this restriction.
+        */
+        {
+            Class<?> class_ChatRepo = XposedHelpers.findClass(GRINDR_PKG + ".persistence.repository.ChatRepo", lpparam.classLoader);
+            Class<?> class_Continuation = XposedHelpers.findClass("kotlin.coroutines.Continuation", lpparam.classLoader);
+            Class<?> class_Boxing = XposedHelpers.findClass("kotlin.coroutines.jvm.internal.Boxing", lpparam.classLoader);
+
+            Object returnWrappedTrue = XposedHelpers.callStaticMethod(class_Boxing, "boxBoolean", true);
+            XposedHelpers.findAndHookMethod(class_ChatRepo, "checkMessageForVideoCall", String.class, class_Continuation,
+                    XC_MethodReplacement.returnConstant(returnWrappedTrue));
+        }
     }
 }
