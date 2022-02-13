@@ -23,15 +23,6 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             findAndHookMethod(class_Feature, "isNotGranted", RETURN_FALSE);
         }
 
-        {
-            Class<?> class_BaseUserSession = findClass(GRINDR_PKG + ".base.model.BaseUserSession", lpparam.classLoader);
-            findAndHookMethod(class_BaseUserSession, "isFreeUser", RETURN_FALSE);
-            findAndHookMethod(class_BaseUserSession, "isPaidUser", RETURN_TRUE);
-            findAndHookMethod(class_BaseUserSession, "isXtra", RETURN_TRUE);
-            findAndHookMethod(class_BaseUserSession, "isNoXtraUpsell", RETURN_TRUE); //Not sure about what's this.
-            findAndHookMethod(class_BaseUserSession, "isUnlimited", RETURN_TRUE);
-        }
-
         /*
             Allow Fake GPS in order to fake location.
 
