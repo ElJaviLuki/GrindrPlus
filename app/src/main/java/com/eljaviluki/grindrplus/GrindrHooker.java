@@ -17,10 +17,40 @@ public class GrindrHooker implements IXposedHookLoadPackage {
         if (!lpparam.packageName.equals(GRINDR_PKG))
             return;
 
+        /*
+            Grant all the Grindr features (except disabling screenshots).
+            A few more changes may be needed to use all the features.
+        */
         {
             Class<?> class_Feature = findClass(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
-            findAndHookMethod(class_Feature, "isGranted", RETURN_TRUE);
-            findAndHookMethod(class_Feature, "isNotGranted", RETURN_FALSE);
+
+            /*
+                Hook:   .method public final isGranted()Z
+                    Hook it, the callback will check if this.name != "DisableScreenshot" and then return true.
+            */
+            findAndHookMethod(class_Feature, "isGranted", new XC_MethodReplacement() {
+                @Override
+                protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                    //Equivalent:   if(this.name.equals("DisableScreenshot"))
+                    if (((String) getObjectField(param.thisObject, "name")).equals("DisableScreenshot")){
+                        return false;
+                    }
+
+                    return true;
+                }
+            });
+
+            /*
+                Hook:   .method public final isNotGranted()Z
+                    Make it return the opposite to isGranted().
+            */
+            findAndHookMethod(class_Feature, "isNotGranted", new XC_MethodReplacement() {
+                @Override
+                protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                    //Equivalent:   return !this.isGranted();
+                    return !((boolean) callMethod(param.thisObject, "isGranted"));
+                }
+            });
         }
 
         /*
