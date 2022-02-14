@@ -4,12 +4,12 @@ import static de.robv.android.xposed.XposedHelpers.*;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class GrindrHooker implements IXposedHookLoadPackage {
     static final XC_MethodReplacement RETURN_TRUE = XC_MethodReplacement.returnConstant(true);
     static final XC_MethodReplacement RETURN_FALSE = XC_MethodReplacement.returnConstant(false);
+    static final XC_MethodReplacement RETURN_INTEGER_MAX_VALUE = XC_MethodReplacement.returnConstant(Integer.MAX_VALUE);
     static final String GRINDR_PKG = "com.grindrapp.android";
 
     @Override
@@ -51,6 +51,27 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                     return !((boolean) callMethod(param.thisObject, "isGranted"));
                 }
             });
+        }
+
+        // Unlimited expiring photos
+        {
+            /*
+                Hack Lcom/grindrapp/android/model/ExpiringPhotoStatusResponse;->total:I to give unlimited expiring photos.
+                Hack Lcom/grindrapp/android/model/ExpiringPhotoStatusResponse;->available:I to give unlimited expiring photos.
+            */
+            Class<?> class_ExpiringPhotoStatusResponse = findClass(GRINDR_PKG + ".model.ExpiringPhotoStatusResponse", lpparam.classLoader);
+
+            /*
+                Hook:   .method public final getTotal()I
+                    Make it return a constant value.
+            */
+            findAndHookMethod(class_ExpiringPhotoStatusResponse, "getTotal", RETURN_INTEGER_MAX_VALUE);
+
+            /*
+                Hook:   .method public final getAvailable()I
+                    Make it return a constant value.
+            */
+            findAndHookMethod(class_ExpiringPhotoStatusResponse, "getAvailable", RETURN_INTEGER_MAX_VALUE);
         }
 
         /*
