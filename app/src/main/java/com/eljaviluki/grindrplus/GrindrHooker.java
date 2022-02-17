@@ -74,6 +74,43 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             findAndHookMethod(class_ExpiringPhotoStatusResponse, "getAvailable", RETURN_INTEGER_MAX_VALUE);
         }
 
+        // Unlimited and Xtra account features
+        {
+            /*
+                Hack Lcom/grindrapp/android/storage/UserSession;->isFree()Z (return false)
+                Hack Lcom/grindrapp/android/storage/UserSession;->isNoXtraUpsell()Z (return false)
+                Hack Lcom/grindrapp/android/storage/UserSession;->isXtra()Z to give Xtra account features.
+                Hack Lcom/grindrapp/android/storage/UserSession;->isUnlimited()Z to give Unlimited account features. 
+            */
+            //com.grindrapp.android.storage.UserSession
+            Class<?> class_UserSession = findClass(GRINDR_PKG + ".storage.ak", lpparam.classLoader);
+
+            /*
+                Hook:   .method public final isFree()Z
+                    Make it return false.
+            */
+            findAndHookMethod(class_UserSession, "l", RETURN_FALSE);
+
+            /*
+                Hook:   .method public final isNoXtraUpsell()Z
+                    Make it return a constant value.
+                    Not sure what this is for.
+            */
+            findAndHookMethod(class_UserSession, "m", RETURN_FALSE);
+
+            /*
+                Hook:   .method public final isXtra()Z
+                    Make it return a constant value.
+            */
+            findAndHookMethod(class_UserSession, "n", RETURN_TRUE);
+
+            /*
+                Hook:   .method public final isUnlimited()Z
+                    Make it return a constant value.
+            */
+            findAndHookMethod(class_UserSession, "o", RETURN_TRUE);
+        }
+
         /*
             Allow Fake GPS in order to fake location.
 
