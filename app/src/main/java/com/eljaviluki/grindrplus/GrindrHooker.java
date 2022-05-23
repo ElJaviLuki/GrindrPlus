@@ -2,6 +2,8 @@ package com.eljaviluki.grindrplus;
 
 import static de.robv.android.xposed.XposedHelpers.*;
 
+import java.util.List;
+
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -14,8 +16,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        if (!lpparam.packageName.equals(GRINDR_PKG))
-            return;
+        if (!lpparam.packageName.equals(GRINDR_PKG)) return;
 
         /*
             Grant all the Grindr features (except disabling screenshots).
@@ -83,32 +84,32 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 Hack Lcom/grindrapp/android/storage/UserSession;->isUnlimited()Z to give Unlimited account features. 
             */
             //com.grindrapp.android.storage.UserSession
-            Class<?> class_UserSession = findClass(GRINDR_PKG + ".storage.ak", lpparam.classLoader);
+            Class<?> class_UserSession = findClass(GRINDR_PKG + ".storage.aj", lpparam.classLoader);
 
             /*
                 Hook:   .method public final isFree()Z
                     Make it return false.
             */
-            findAndHookMethod(class_UserSession, "l", RETURN_FALSE);
+            findAndHookMethod(class_UserSession, "g", RETURN_FALSE);
 
             /*
                 Hook:   .method public final isNoXtraUpsell()Z
                     Make it return a constant value.
                     Not sure what this is for.
             */
-            findAndHookMethod(class_UserSession, "m", RETURN_FALSE);
+            findAndHookMethod(class_UserSession, "h", RETURN_FALSE);
 
             /*
                 Hook:   .method public final isXtra()Z
                     Make it return a constant value.
             */
-            findAndHookMethod(class_UserSession, "n", RETURN_TRUE);
+            findAndHookMethod(class_UserSession, "i", RETURN_TRUE);
 
             /*
                 Hook:   .method public final isUnlimited()Z
                     Make it return a constant value.
             */
-            findAndHookMethod(class_UserSession, "o", RETURN_TRUE);
+            findAndHookMethod(class_UserSession, "j", RETURN_TRUE);
         }
 
         /*
