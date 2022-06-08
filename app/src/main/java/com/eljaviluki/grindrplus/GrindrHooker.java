@@ -111,7 +111,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 Hack Lcom/grindrapp/android/storage/UserSession;->isUnlimited()Z to give Unlimited account features. 
             */
             //com.grindrapp.android.storage.UserSession
-            Class<?> class_UserSession = findClassIfExists(GRINDR_PKG + ".storage.aj", lpparam.classLoader);
+            Class<?> class_UserSession = findClassIfExists(GRINDR_PKG + ".storage.ai", lpparam.classLoader);
 
             if(class_UserSession != null){
                 /*
