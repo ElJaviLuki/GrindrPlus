@@ -117,6 +117,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 /*
                     Hook:   .method public final isFree()Z
                         Make it return false.
+                        Some features will not work if set to true.
                 */
                 try{
                     findAndHookMethod(class_UserSession, "g", RETURN_FALSE);
