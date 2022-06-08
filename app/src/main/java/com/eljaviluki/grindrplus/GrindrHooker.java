@@ -105,14 +105,14 @@ public class GrindrHooker implements IXposedHookLoadPackage {
         // Unlimited and Xtra account features
         {
             /*
-                Hack Lcom/grindrapp/android/storage/UserSession;->isFree()Z (return false)
-                Hack Lcom/grindrapp/android/storage/UserSession;->isNoXtraUpsell()Z (return false)
-                Hack Lcom/grindrapp/android/storage/UserSession;->isXtra()Z to give Xtra account features.
-                Hack Lcom/grindrapp/android/storage/UserSession;->isUnlimited()Z to give Unlimited account features. 
+                Hook these methods in all the classes that implement IUserSession.
+                    isFree()Z (return false)
+                    isNoXtraUpsell()Z (return false)
+                    isXtra()Z to give Xtra account features.
+                    isUnlimited()Z to give Unlimited account features.
             */
-            //com.grindrapp.android.storage.UserSession
-            Class<?> class_UserSession = findClassIfExists(GRINDR_PKG + ".storage.ai", lpparam.classLoader);
 
+            Class<?> class_UserSession = findClassIfExists(GRINDR_PKG + ".storage.ai", lpparam.classLoader);
             if(class_UserSession != null){
                 /*
                     Hook:   .method public final isFree()Z
@@ -159,6 +159,52 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".storage.UserSession (obfuscated) not found.");
             }
 
+            Class<?> class_UserSession2 = findClassIfExists(GRINDR_PKG + ".storage.aj", lpparam.classLoader);
+            if(class_UserSession2 != null){
+                /*
+                    Hook:   .method public final isFree()Z
+                        Make it return false.
+                        Some features will not work if set to true.
+                */
+                try{
+                    findAndHookMethod(class_UserSession2, "g", RETURN_FALSE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+
+                /*
+                    Hook:   .method public final isNoXtraUpsell()Z
+                        Make it return a constant value.
+                        Not sure what this is for.
+                */
+                try{
+                    findAndHookMethod(class_UserSession2, "h", RETURN_FALSE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+
+                /*
+                    Hook:   .method public final isXtra()Z
+                        Make it return a constant value.
+                */
+                try{
+                    findAndHookMethod(class_UserSession2, "i", RETURN_TRUE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+
+                /*
+                    Hook:   .method public final isUnlimited()Z
+                        Make it return a constant value.
+                */
+                try{
+                    findAndHookMethod(class_UserSession2, "j", RETURN_TRUE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+            }else{
+                XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".storage.UserSession2 (obfuscated) not found.");
+            }
         }
 
         {
