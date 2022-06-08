@@ -6,6 +6,8 @@ import java.util.List;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class GrindrHooker implements IXposedHookLoadPackage {
@@ -23,35 +25,48 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             A few more changes may be needed to use all the features.
         */
         {
-            Class<?> class_Feature = findClass(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
+            Class<?> class_Feature = findClassIfExists(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
 
-            /*
-                Hook:   .method public final isGranted()Z
-                    Hook it, the callback will check if this.name != "DisableScreenshot" and then return true.
-            */
-            findAndHookMethod(class_Feature, "isGranted", new XC_MethodReplacement() {
-                @Override
-                protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                    //Equivalent:   if(this.name.equals("DisableScreenshot"))
-                    if (((String) getObjectField(param.thisObject, "name")).equals("DisableScreenshot")){
-                        return false;
-                    }
+            if(class_Feature != null){
+                /*
+                    Hook:   .method public final isGranted()Z
+                        Hook it, the callback will check if this.name != "DisableScreenshot" and then return true.
+                */
+                try{
+                    findAndHookMethod(class_Feature, "isGranted", new XC_MethodReplacement() {
+                        @Override
+                        protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                            //Equivalent:   if(this.name.equals("DisableScreenshot"))
+                            if (((String) getObjectField(param.thisObject, "name")).equals("DisableScreenshot")){
+                                return false;
+                            }
 
-                    return true;
+                            return true;
+                        }
+                    });
+                }catch(Exception e){
+                    XposedBridge.log(e);
                 }
-            });
 
-            /*
-                Hook:   .method public final isNotGranted()Z
-                    Make it return the opposite to isGranted().
-            */
-            findAndHookMethod(class_Feature, "isNotGranted", new XC_MethodReplacement() {
-                @Override
-                protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                    //Equivalent:   return !this.isGranted();
-                    return !((boolean) callMethod(param.thisObject, "isGranted"));
+                /*
+                    Hook:   .method public final isNotGranted()Z
+                        Make it return the opposite to isGranted().
+                */
+                try{
+                    findAndHookMethod(class_Feature, "isNotGranted", new XC_MethodReplacement() {
+                        @Override
+                        protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                            //Equivalent:   return !this.isGranted();
+                            return !((boolean) callMethod(param.thisObject, "isGranted"));
+                        }
+                    });
+                }catch(Exception e){
+                    XposedBridge.log(e);
                 }
-            });
+            }else{
+                XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".model.Feature not found.");
+            }
+
         }
 
         // Unlimited expiring photos
@@ -60,19 +75,31 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 Hack Lcom/grindrapp/android/model/ExpiringPhotoStatusResponse;->total:I to give unlimited expiring photos.
                 Hack Lcom/grindrapp/android/model/ExpiringPhotoStatusResponse;->available:I to give unlimited expiring photos.
             */
-            Class<?> class_ExpiringPhotoStatusResponse = findClass(GRINDR_PKG + ".model.ExpiringPhotoStatusResponse", lpparam.classLoader);
+            Class<?> class_ExpiringPhotoStatusResponse = findClassIfExists(GRINDR_PKG + ".model.ExpiringPhotoStatusResponse", lpparam.classLoader);
 
-            /*
-                Hook:   .method public final getTotal()I
-                    Make it return a constant value.
-            */
-            findAndHookMethod(class_ExpiringPhotoStatusResponse, "getTotal", RETURN_INTEGER_MAX_VALUE);
+            if(class_ExpiringPhotoStatusResponse != null){
+                /*
+                    Hook:   .method public final getTotal()I
+                        Make it return a constant value.
+                */
+                try{
+                    findAndHookMethod(class_ExpiringPhotoStatusResponse, "getTotal", RETURN_INTEGER_MAX_VALUE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
 
-            /*
-                Hook:   .method public final getAvailable()I
-                    Make it return a constant value.
-            */
-            findAndHookMethod(class_ExpiringPhotoStatusResponse, "getAvailable", RETURN_INTEGER_MAX_VALUE);
+                /*
+                    Hook:   .method public final getAvailable()I
+                        Make it return a constant value.
+                */
+                try{
+                    findAndHookMethod(class_ExpiringPhotoStatusResponse, "getAvailable", RETURN_INTEGER_MAX_VALUE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+            }else{
+                XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".model.ExpiringPhotoStatusResponse not found.");
+            }
         }
 
         // Unlimited and Xtra account features
@@ -84,42 +111,71 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 Hack Lcom/grindrapp/android/storage/UserSession;->isUnlimited()Z to give Unlimited account features. 
             */
             //com.grindrapp.android.storage.UserSession
-            Class<?> class_UserSession = findClass(GRINDR_PKG + ".storage.aj", lpparam.classLoader);
+            Class<?> class_UserSession = findClassIfExists(GRINDR_PKG + ".storage.aj", lpparam.classLoader);
 
-            /*
-                Hook:   .method public final isFree()Z
-                    Make it return false.
-            */
-            findAndHookMethod(class_UserSession, "g", RETURN_FALSE);
+            if(class_UserSession != null){
+                /*
+                    Hook:   .method public final isFree()Z
+                        Make it return false.
+                */
+                try{
+                    findAndHookMethod(class_UserSession, "g", RETURN_FALSE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
 
-            /*
-                Hook:   .method public final isNoXtraUpsell()Z
-                    Make it return a constant value.
-                    Not sure what this is for.
-            */
-            findAndHookMethod(class_UserSession, "h", RETURN_FALSE);
+                /*
+                    Hook:   .method public final isNoXtraUpsell()Z
+                        Make it return a constant value.
+                        Not sure what this is for.
+                */
+                try{
+                    findAndHookMethod(class_UserSession, "h", RETURN_FALSE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
 
-            /*
-                Hook:   .method public final isXtra()Z
-                    Make it return a constant value.
-            */
-            findAndHookMethod(class_UserSession, "i", RETURN_TRUE);
+                /*
+                    Hook:   .method public final isXtra()Z
+                        Make it return a constant value.
+                */
+                try{
+                    findAndHookMethod(class_UserSession, "i", RETURN_TRUE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
 
-            /*
-                Hook:   .method public final isUnlimited()Z
-                    Make it return a constant value.
-            */
-            findAndHookMethod(class_UserSession, "j", RETURN_TRUE);
+                /*
+                    Hook:   .method public final isUnlimited()Z
+                        Make it return a constant value.
+                */
+                try{
+                    findAndHookMethod(class_UserSession, "j", RETURN_TRUE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+            }else{
+                XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".storage.UserSession (obfuscated) not found.");
+            }
+
         }
 
-        /*
-            Allow Fake GPS in order to fake location.
-
-            WARNING: Abusing this feature may result in a permanent ban on your Grindr account.
-         */
         {
-            Class<?> class_Location = findClass("android.location.Location", lpparam.classLoader);
-            findAndHookMethod(class_Location, "isFromMockProvider", RETURN_FALSE);
+            Class<?> class_Location = findClassIfExists("android.location.Location", lpparam.classLoader);
+            if(class_Location != null){
+                /*
+                    Allow Fake GPS in order to fake location.
+
+                    WARNING: Abusing this feature may result in a permanent ban on your Grindr account.
+                */
+                try{
+                    findAndHookMethod(class_Location, "isFromMockProvider", RETURN_FALSE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+            }else{
+                XposedBridge.log("GRINDR - Class android.location.Location not found");
+            }
         }
 
         /*
@@ -129,13 +185,18 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             This hook allows the user to bypass this restriction.
         */
         {
-            Class<?> class_ChatRepo = findClass(GRINDR_PKG + ".persistence.repository.ChatRepo", lpparam.classLoader);
-            Class<?> class_Continuation = findClass("kotlin.coroutines.Continuation", lpparam.classLoader);
-            Class<?> class_Boxing = findClass("kotlin.coroutines.jvm.internal.Boxing", lpparam.classLoader);
+            try{
+                Class<?> class_ChatRepo = findClass(GRINDR_PKG + ".persistence.repository.ChatRepo", lpparam.classLoader);
+                Class<?> class_Continuation = findClass("kotlin.coroutines.Continuation", lpparam.classLoader);
+                Class<?> class_Boxing = findClass("kotlin.coroutines.jvm.internal.Boxing", lpparam.classLoader);
 
-            Object returnWrappedTrue = callStaticMethod(class_Boxing, "boxBoolean", true);
-            findAndHookMethod(class_ChatRepo, "checkMessageForVideoCall", String.class, class_Continuation,
-                    XC_MethodReplacement.returnConstant(returnWrappedTrue));
+                Object returnWrappedTrue = callStaticMethod(class_Boxing, "boxBoolean", true);
+                findAndHookMethod(class_ChatRepo, "checkMessageForVideoCall", String.class, class_Continuation,
+                        XC_MethodReplacement.returnConstant(returnWrappedTrue));
+            }catch(Exception e){
+                XposedBridge.log(e);
+            }
+
         }
     }
 }
