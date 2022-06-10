@@ -166,6 +166,24 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             }else{
                 XposedBridge.log("GRINDR - Class kotlin.coroutines.Continuation or kotlin.coroutines.jvm.internal.Boxing not found.");
             }
+
+            {
+                /*
+                    Hook in class .experiment.Experiments
+                    public final fun uncheckedIsEnabled(expMgr: com.grindrapp.android.base.experiment.IExperimentsManager): kotlin.Boolean
+                        Make it return true
+
+                    This allows to use SOME (not all of them) hidden features that Grindr developers have not yet made public or they are just testing.
+                */
+                try{
+                    Class<?> class_Experiments = findClass(GRINDR_PKG + ".experiment.Experiments", lpparam.classLoader);
+                    Class<?> class_IExperimentsManager = findClass(GRINDR_PKG + ".base.g.b", lpparam.classLoader);
+
+                    findAndHookMethod(class_Experiments, "a", class_IExperimentsManager, RETURN_TRUE);
+                }catch(Exception e){
+                    XposedBridge.log(e);
+                }
+            }
         }
 
     }
