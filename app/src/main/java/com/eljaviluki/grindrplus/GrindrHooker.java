@@ -1,13 +1,15 @@
 package com.eljaviluki.grindrplus;
 
-import static de.robv.android.xposed.XposedHelpers.*;
-
-import java.util.List;
+import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
+import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.findClassIfExists;
+import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class GrindrHooker implements IXposedHookLoadPackage {
@@ -20,11 +22,11 @@ public class GrindrHooker implements IXposedHookLoadPackage {
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (!lpparam.packageName.equals(GRINDR_PKG)) return;
 
-        /*
-            Grant all the Grindr features (except disabling screenshots).
-            A few more changes may be needed to use all the features.
-        */
         {
+            /*
+                Grant all the Grindr features (except disabling screenshots).
+                A few more changes may be needed to use all the features.
+            */
             Class<?> class_Feature = findClassIfExists(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
 
             if(class_Feature != null){
@@ -137,27 +139,35 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             }
         }
 
-        /*
-            Allow videocalls on empty chats: Grindr checks that both users have chatted with each other
-            (both must have sent at least one message to the other) in order to allow videocalls.
-
-            This hook allows the user to bypass this restriction.
-        */
         {
-            try{
-                Class<?> class_ChatRepo = findClass(GRINDR_PKG + ".persistence.repository.ChatRepo", lpparam.classLoader);
-                Class<?> class_Continuation = findClass("kotlin.coroutines.Continuation", lpparam.classLoader);
-                Class<?> class_Boxing = findClass("kotlin.coroutines.jvm.internal.Boxing", lpparam.classLoader);
+            //Find Kotlin utils
+            Class<?> class_Continuation = findClassIfExists("kotlin.coroutines.Continuation", lpparam.classLoader);
+            Class<?> class_Boxing = findClassIfExists("kotlin.coroutines.jvm.internal.Boxing", lpparam.classLoader);
 
+            if(class_Continuation != null && class_Boxing != null){
                 Object returnWrappedTrue = callStaticMethod(class_Boxing, "boxBoolean", true);
-                findAndHookMethod(class_ChatRepo, "checkMessageForVideoCall", String.class, class_Continuation,
-                        XC_MethodReplacement.returnConstant(returnWrappedTrue));
-            }catch(Exception e){
-                XposedBridge.log(e);
+
+                {
+                    /*
+                        Allow videocalls on empty chats: Grindr checks that both users have chatted with each other
+                        (both must have sent at least one message to the other) in order to allow videocalls.
+
+                        This hook allows the user to bypass this restriction.
+                    */
+                    try{
+                        Class<?> class_ChatRepo = findClass(GRINDR_PKG + ".persistence.repository.ChatRepo", lpparam.classLoader);
+
+                        findAndHookMethod(class_ChatRepo, "checkMessageForVideoCall", String.class, class_Continuation,
+                                XC_MethodReplacement.returnConstant(returnWrappedTrue));
+                    }catch(Exception e){
+                        XposedBridge.log(e);
+                    }
+                }
+            }else{
+                XposedBridge.log("GRINDR - Class kotlin.coroutines.Continuation or kotlin.coroutines.jvm.internal.Boxing not found.");
             }
-
-
         }
+
     }
 
     private void hookUserSessionImpl(Class<?> UserSessionImpl) {
