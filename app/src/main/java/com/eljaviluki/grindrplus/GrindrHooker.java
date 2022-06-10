@@ -120,7 +120,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Some features will not work if set to true.
                 */
                 try{
-                    findAndHookMethod(class_UserSession, "g", RETURN_FALSE);
+                    findAndHookMethod(class_UserSession, "i", RETURN_FALSE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -131,7 +131,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Not sure what this is for.
                 */
                 try{
-                    findAndHookMethod(class_UserSession, "h", RETURN_FALSE);
+                    findAndHookMethod(class_UserSession, "j", RETURN_FALSE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -141,7 +141,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Make it return a constant value.
                 */
                 try{
-                    findAndHookMethod(class_UserSession, "i", RETURN_TRUE);
+                    findAndHookMethod(class_UserSession, "k", RETURN_TRUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -151,7 +151,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Make it return a constant value.
                 */
                 try{
-                    findAndHookMethod(class_UserSession, "j", RETURN_TRUE);
+                    findAndHookMethod(class_UserSession, "l", RETURN_TRUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -167,7 +167,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Some features will not work if set to true.
                 */
                 try{
-                    findAndHookMethod(class_UserSession2, "g", RETURN_FALSE);
+                    findAndHookMethod(class_UserSession2, "i", RETURN_FALSE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -178,7 +178,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Not sure what this is for.
                 */
                 try{
-                    findAndHookMethod(class_UserSession2, "h", RETURN_FALSE);
+                    findAndHookMethod(class_UserSession2, "j", RETURN_FALSE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -188,7 +188,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Make it return a constant value.
                 */
                 try{
-                    findAndHookMethod(class_UserSession2, "i", RETURN_TRUE);
+                    findAndHookMethod(class_UserSession2, "k", RETURN_TRUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -198,7 +198,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         Make it return a constant value.
                 */
                 try{
-                    findAndHookMethod(class_UserSession2, "j", RETURN_TRUE);
+                    findAndHookMethod(class_UserSession2, "l", RETURN_TRUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
