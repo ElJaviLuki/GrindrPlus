@@ -8,6 +8,7 @@ import static de.robv.android.xposed.XposedHelpers.findClassIfExists;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -31,40 +32,45 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
             if(class_Feature != null){
                 /*
-                    Hook:   .method public final isGranted()Z
-                        Hook it, the callback will check if this.name != "DisableScreenshot" and then return true.
+                    "Grant a feature" Callback:
+                        The callback will check if this.name != "DisableScreenshot" (the only feature I'm not interested in at this moment)
+                        and then return true.
                 */
-                try{
-                    findAndHookMethod(class_Feature, "isGranted", new XC_MethodReplacement() {
-                        @Override
-                        protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                            //Equivalent:   if(this.name.equals("DisableScreenshot"))
-                            if (((String) getObjectField(param.thisObject, "name")).equals("DisableScreenshot")){
-                                return false;
-                            }
-
-                            return true;
+                XC_MethodHook grantedCallback = new XC_MethodReplacement() {
+                    @Override
+                    protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                        //Equivalent:   if(this.name.equals("DisableScreenshot"))
+                        if (((String) getObjectField(param.thisObject, "name")).equals("DisableScreenshot")){
+                            return false;
                         }
-                    });
-                }catch(Exception e){
-                    XposedBridge.log(e);
-                }
 
-                /*
-                    Hook:   .method public final isNotGranted()Z
-                        Make it return the opposite to isGranted().
-                */
-                try{
-                    findAndHookMethod(class_Feature, "isNotGranted", new XC_MethodReplacement() {
-                        @Override
-                        protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                            //Equivalent:   return !this.isGranted();
-                            return !((boolean) callMethod(param.thisObject, "isGranted"));
-                        }
-                    });
-                }catch(Exception e){
-                    XposedBridge.log(e);
-                }
+                        return true;
+                    }
+                };
+
+                //This one just reverses the result of the previous one. (!false -> true)
+                XC_MethodHook notGrantedCallback = new XC_MethodReplacement() {
+                    @Override
+                    protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                        //Equivalent:   return !this.isGranted();
+                        return !((boolean) callMethod(param.thisObject, "isGranted"));
+                    }
+                };
+                
+
+                // .method public final isGranted()Z, hook with 'grantedCallback'
+                findAndHookMethod(class_Feature, "isGranted", grantedCallback);
+
+                // .method public final isNotGranted()Z, hook with 'notGrantedCallback'
+                findAndHookMethod(class_Feature, "isNotGranted", notGrantedCallback);
+
+
+                Class<?> class_IUserSession = findClass(GRINDR_PKG + ".storage.IUserSession", lpparam.classLoader);
+                // .method public final isGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'grantedCallback'
+                findAndHookMethod(class_Feature, "isGranted", class_IUserSession, grantedCallback);
+
+                // .method public final isNotGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'notGrantedCallback'
+                findAndHookMethod(class_Feature, "isNotGranted", class_IUserSession, notGrantedCallback);
             }else{
                 XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".model.Feature not found.");
             }
