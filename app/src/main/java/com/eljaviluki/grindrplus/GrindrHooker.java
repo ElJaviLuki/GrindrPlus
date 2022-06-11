@@ -11,6 +11,8 @@ import static de.robv.android.xposed.XposedHelpers.getStaticIntField;
 import static de.robv.android.xposed.XposedHelpers.newInstance;
 
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -83,6 +85,23 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".model.Feature not found.");
             }
 
+        }
+
+        /*
+           Allow screenshots in all the views of the application (including expiring photos, albums, etc.)
+
+           Inspired in the project https://github.com/veeti/DisableFlagSecure
+           Credit and thanks to @veeti!
+        */
+        {
+            XposedHelpers.findAndHookMethod(Window.class, "setFlags", int.class, int.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    Integer flags = (Integer) param.args[0];
+                    flags &= ~WindowManager.LayoutParams.FLAG_SECURE;
+                    param.args[0] = flags;
+                }
+            });
         }
 
         // Unlimited expiring photos
