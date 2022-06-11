@@ -196,9 +196,11 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                     isUnlimited()Z to give Unlimited account features.
             */
 
+            //"UserSession" class
             Class<?> class_UserSession = findClassIfExists(GRINDR_PKG + ".storage.ai", lpparam.classLoader);
             hookUserSessionImpl(class_UserSession);
 
+            //"UserSession2" class
             Class<?> class_UserSession2 = findClassIfExists(GRINDR_PKG + ".storage.aj", lpparam.classLoader);
             hookUserSessionImpl(class_UserSession2);
         }
@@ -251,16 +253,13 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
             {
                 /*
-                    Hook in class .experiment.Experiments
-                    public final fun uncheckedIsEnabled(expMgr: com.grindrapp.android.base.experiment.IExperimentsManager): kotlin.Boolean
-                        Make it return true
-
-                    This allows to use SOME (not all of them) hidden features that Grindr developers have not yet made public or they are just testing.
+                    Allow to use SOME (not all of them) hidden features that Grindr developers have not yet made public or they are just testing.
                 */
                 try{
                     Class<?> class_Experiments = findClass(GRINDR_PKG + ".experiment.Experiments", lpparam.classLoader);
                     Class<?> class_IExperimentsManager = findClass(GRINDR_PKG + ".base.g.b", lpparam.classLoader);
 
+                    //public final fun uncheckedIsEnabled(expMgr: com.grindrapp.android.base.experiment.IExperimentsManager): kotlin.Boolean
                     findAndHookMethod(class_Experiments, "a", class_IExperimentsManager, RETURN_TRUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
