@@ -5,12 +5,21 @@ import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.findClassIfExists;
+import static de.robv.android.xposed.XposedHelpers.getLongField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.getStaticIntField;
+import static de.robv.android.xposed.XposedHelpers.newInstance;
+
+import android.view.View;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class GrindrHooker implements IXposedHookLoadPackage {
@@ -56,7 +65,6 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         return !((boolean) callMethod(param.thisObject, "isGranted"));
                     }
                 };
-                
 
                 // .method public final isGranted()Z, hook with 'grantedCallback'
                 findAndHookMethod(class_Feature, "isGranted", grantedCallback);
@@ -108,6 +116,74 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             }else{
                 XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".model.ExpiringPhotoStatusResponse not found.");
             }
+        }
+
+        /*
+            Add extra profile fields with more information:
+                - Profile ID
+                - Last seen (exact date and time)
+        */
+        try{
+            Class<?> class_ProfileFieldsView = findClassIfExists(GRINDR_PKG + ".ui.profileV2.ProfileFieldsView", lpparam.classLoader);
+            Class<?> class_Profile = findClassIfExists(GRINDR_PKG + ".persistence.model.Profile", lpparam.classLoader);
+            Class<?> class_ExtendedProfileFieldView = findClassIfExists(GRINDR_PKG + ".view.bv", lpparam.classLoader);
+            Class<?> class_R_color = findClassIfExists(GRINDR_PKG + ".m$d", lpparam.classLoader);
+            Class<?> class_Styles = findClassIfExists(GRINDR_PKG + ".utils.bh", lpparam.classLoader);
+
+            findAndHookMethod(class_ProfileFieldsView, "setProfile", class_Profile, new XC_MethodHook() {
+                Object fieldsViewInstance;
+                Object context;
+
+                int labelColorId; //Label color cannot be assigned when the program has just been launched, since the data to be used is not created at this point.
+                final int valueColorId = getStaticIntField(class_R_color, "I"); //R.color.grindr_pure_white
+
+                private int getLabelColorId(){
+                    //'Styles' class singleton instance.
+                    Object stylesSingleton = XposedHelpers.getStaticObjectField(class_Styles, "a");
+
+                    //Some color field reference (maybe 'pureWhite', not sure)
+                    return (int) callMethod(stylesSingleton, "f");
+                }
+
+                private String toReadableDate(long timestamp){
+                    return SimpleDateFormat.getDateTimeInstance().format(new Date(timestamp));
+                }
+
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    fieldsViewInstance = param.thisObject;
+                    context = callMethod(fieldsViewInstance, "getContext"); //Call this.getContext()
+
+                    labelColorId = getLabelColorId();
+
+                    //Get profile instance in the 1st parameter
+                    Object profile = param.args[0];
+
+                    addProfileFieldUi("Profile ID", (CharSequence) getObjectField(profile, "profileId"));
+                    addProfileFieldUi("Last Seen", toReadableDate(getLongField(profile, "seen")));
+
+                    //.setVisibility() of param.thisObject to always VISIBLE (otherwise if the profile has no fields, the additional ones will not be shown)
+                    callMethod(param.thisObject, "setVisibility", View.VISIBLE);
+                }
+
+                private void addProfileFieldUi(CharSequence label, CharSequence value) {
+                    Object extendedProfileFieldView = newInstance(class_ExtendedProfileFieldView, context);
+
+                    //public final fun setLabel(typeText: kotlin.CharSequence?, color: kotlin.Int /* = compiled code */): kotlin.Unit
+                    callMethod(extendedProfileFieldView, "a", label, labelColorId);
+
+                    //public final fun setValue(value: kotlin.CharSequence?, colorId: kotlin.Int /* = compiled code */): kotlin.Unit
+                    callMethod(extendedProfileFieldView, "b", value, valueColorId);
+
+                    //From View.setContentDescription(...)
+                    callMethod(extendedProfileFieldView, "setContentDescription", value);
+
+                    //(ProfileFieldsView).addView(Landroid/view/View;)V
+                    callMethod(fieldsViewInstance, "addView", extendedProfileFieldView);
+                }
+            });
+        }catch (Exception e){
+            XposedBridge.log(e);
         }
 
         // Unlimited and Xtra account features
