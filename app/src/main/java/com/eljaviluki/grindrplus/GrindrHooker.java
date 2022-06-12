@@ -30,16 +30,18 @@ public class GrindrHooker implements IXposedHookLoadPackage {
     static final XC_MethodReplacement RETURN_INTEGER_MAX_VALUE = XC_MethodReplacement.returnConstant(Integer.MAX_VALUE);
     static final String GRINDR_PKG = "com.grindrapp.android";
 
+    Class<?> class_Feature;
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (!lpparam.packageName.equals(GRINDR_PKG)) return;
 
+        class_Feature = findClassIfExists(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
         {
             /*
                 Grant all the Grindr features (except disabling screenshots).
                 A few more changes may be needed to use all the features.
             */
-            Class<?> class_Feature = findClassIfExists(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
 
             if(class_Feature != null){
                 /*
@@ -290,42 +292,41 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
     private void hookUserSessionImpl(Class<?> UserSessionImpl) {
         if(UserSessionImpl != null){
-            /*
-                Hook:   .method public final isFree()Z
-                    Make it return false.
-                    Some features will not work if set to true.
-            */
+            //public open fun hasFeature(feature: com.grindrapp.android.model.Feature): kotlin.Boolean
+            try{
+                findAndHookMethod(UserSessionImpl, "a", class_Feature, new XC_MethodReplacement() {
+                    @Override
+                    protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                        return true;
+                    }
+                });
+            }catch(Exception e){
+                XposedBridge.log(e);
+            }
+
+            //public open fun isFree(): kotlin.Boolean
             try{
                 findAndHookMethod(UserSessionImpl, "i", RETURN_FALSE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
 
-            /*
-                Hook:   .method public final isNoXtraUpsell()Z
-                    Make it return a constant value.
-                    Not sure what this is for.
-            */
+            //public open fun isNoXtraUpsell(): kotlin.Boolean
+            //Not sure what is this for
             try{
                 findAndHookMethod(UserSessionImpl, "j", RETURN_FALSE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
 
-            /*
-                Hook:   .method public final isXtra()Z
-                    Make it return a constant value.
-            */
+            //public open fun isXtra(): kotlin.Boolean
             try{
                 findAndHookMethod(UserSessionImpl, "k", RETURN_TRUE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
 
-            /*
-                Hook:   .method public final isUnlimited()Z
-                    Make it return a constant value.
-            */
+            //public open fun isUnlimited(): kotlin.Boolean
             try{
                 findAndHookMethod(UserSessionImpl, "l", RETURN_TRUE);
             }catch(Exception e) {
