@@ -33,7 +33,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
     Class<?> class_Feature;
 
     @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
         if (!lpparam.packageName.equals(GRINDR_PKG)) return;
 
         class_Feature = findClassIfExists(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
@@ -44,45 +44,19 @@ public class GrindrHooker implements IXposedHookLoadPackage {
             */
 
             if(class_Feature != null){
-                /*
-                    "Grant a feature" Callback:
-                        The callback will check if this.name != "DisableScreenshot" (the only feature I'm not interested in at this moment)
-                        and then return true.
-                */
-                XC_MethodHook grantedCallback = new XC_MethodReplacement() {
-                    @Override
-                    protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                        //Equivalent:   if(this.name.equals("DisableScreenshot"))
-                        if (((String) getObjectField(param.thisObject, "name")).equals("DisableScreenshot")){
-                            return false;
-                        }
+                // .method public final isGranted()Z, hook with 'RETURN_TRUE'
+                findAndHookMethod(class_Feature, "isGranted", RETURN_TRUE);
 
-                        return true;
-                    }
-                };
-
-                //This one just reverses the result of the previous one. (!false -> true)
-                XC_MethodHook notGrantedCallback = new XC_MethodReplacement() {
-                    @Override
-                    protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                        //Equivalent:   return !this.isGranted();
-                        return !((boolean) callMethod(param.thisObject, "isGranted"));
-                    }
-                };
-
-                // .method public final isGranted()Z, hook with 'grantedCallback'
-                findAndHookMethod(class_Feature, "isGranted", grantedCallback);
-
-                // .method public final isNotGranted()Z, hook with 'notGrantedCallback'
-                findAndHookMethod(class_Feature, "isNotGranted", notGrantedCallback);
+                // .method public final isNotGranted()Z, hook with 'RETURN_FALSE'
+                findAndHookMethod(class_Feature, "isNotGranted", RETURN_FALSE);
 
 
                 Class<?> class_IUserSession = findClass(GRINDR_PKG + ".storage.IUserSession", lpparam.classLoader);
-                // .method public final isGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'grantedCallback'
-                findAndHookMethod(class_Feature, "isGranted", class_IUserSession, grantedCallback);
+                // .method public final isGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'RETURN_TRUE'
+                findAndHookMethod(class_Feature, "isGranted", class_IUserSession, RETURN_TRUE);
 
-                // .method public final isNotGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'notGrantedCallback'
-                findAndHookMethod(class_Feature, "isNotGranted", class_IUserSession, notGrantedCallback);
+                // .method public final isNotGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'RETURN_FALSE'
+                findAndHookMethod(class_Feature, "isNotGranted", class_IUserSession, RETURN_FALSE);
             }else{
                 XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".model.Feature not found.");
             }
@@ -98,7 +72,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
         {
             XposedHelpers.findAndHookMethod(Window.class, "setFlags", int.class, int.class, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                protected void beforeHookedMethod(MethodHookParam param) {
                     Integer flags = (Integer) param.args[0];
                     flags &= ~WindowManager.LayoutParams.FLAG_SECURE;
                     param.args[0] = flags;
@@ -171,7 +145,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 }
 
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                protected void afterHookedMethod(MethodHookParam param) {
                     fieldsViewInstance = param.thisObject;
                     context = callMethod(fieldsViewInstance, "getContext"); //Call this.getContext()
 
@@ -294,12 +268,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
         if(UserSessionImpl != null){
             //public open fun hasFeature(feature: com.grindrapp.android.model.Feature): kotlin.Boolean
             try{
-                findAndHookMethod(UserSessionImpl, "a", class_Feature, new XC_MethodReplacement() {
-                    @Override
-                    protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                        return true;
-                    }
-                });
+                findAndHookMethod(UserSessionImpl, "a", class_Feature, RETURN_TRUE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
