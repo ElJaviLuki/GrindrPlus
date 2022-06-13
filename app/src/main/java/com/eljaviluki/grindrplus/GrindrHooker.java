@@ -4,6 +4,7 @@ import static com.eljaviluki.grindrplus.Constants.GRINDR_PKG;
 import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_FALSE;
 import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_INTEGER_MAX_VALUE;
 import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_TRUE;
+import static com.eljaviluki.grindrplus.Obfuscation.*;
 import static de.robv.android.xposed.XposedHelpers.*;
 
 import android.view.View;
@@ -17,37 +18,31 @@ import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class GrindrHooker implements IXposedHookLoadPackage {
+
+
     Class<?> class_Feature;
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
         if (!lpparam.packageName.equals(GRINDR_PKG)) return;
 
-        class_Feature = findClassIfExists(GRINDR_PKG + ".model.Feature", lpparam.classLoader);
+        class_Feature = findClassIfExists(GApp.model.Feature, lpparam.classLoader);
         {
             /*
                 Grant all the Grindr features (except disabling screenshots).
                 A few more changes may be needed to use all the features.
             */
-
             if(class_Feature != null){
-                // .method public final isGranted()Z, hook with 'RETURN_TRUE'
-                findAndHookMethod(class_Feature, "isGranted", RETURN_TRUE);
-
-                // .method public final isNotGranted()Z, hook with 'RETURN_FALSE'
-                findAndHookMethod(class_Feature, "isNotGranted", RETURN_FALSE);
+                findAndHookMethod(class_Feature, GApp.model.Feature_.isGranted, RETURN_TRUE);
+                findAndHookMethod(class_Feature, GApp.model.Feature_.isNotGranted, RETURN_FALSE);
 
 
-                Class<?> class_IUserSession = findClass(GRINDR_PKG + ".storage.IUserSession", lpparam.classLoader);
-                // .method public final isGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'RETURN_TRUE'
-                findAndHookMethod(class_Feature, "isGranted", class_IUserSession, RETURN_TRUE);
-
-                // .method public final isNotGranted(Lcom/grindrapp/android/storage/IUserSession;)Z, hook with 'RETURN_FALSE'
-                findAndHookMethod(class_Feature, "isNotGranted", class_IUserSession, RETURN_FALSE);
+                Class<?> class_IUserSession = findClass(GApp.storage.IUserSession, lpparam.classLoader);
+                findAndHookMethod(class_Feature, GApp.model.Feature_.isGranted, class_IUserSession, RETURN_TRUE);
+                findAndHookMethod(class_Feature, GApp.model.Feature_.isNotGranted, class_IUserSession, RETURN_FALSE);
             }else{
                 XposedBridge.log("GRINDR - Class " + GRINDR_PKG + ".model.Feature not found.");
             }
@@ -73,19 +68,17 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
         // Unlimited expiring photos
         {
-            Class<?> class_ExpiringPhotoStatusResponse = findClassIfExists(GRINDR_PKG + ".model.ExpiringPhotoStatusResponse", lpparam.classLoader);
+            Class<?> class_ExpiringPhotoStatusResponse = findClassIfExists(GApp.model.ExpiringPhotoStatusResponse, lpparam.classLoader);
 
             if(class_ExpiringPhotoStatusResponse != null){
-                //.method public final getTotal()I
                 try{
-                    findAndHookMethod(class_ExpiringPhotoStatusResponse, "getTotal", RETURN_INTEGER_MAX_VALUE);
+                    findAndHookMethod(class_ExpiringPhotoStatusResponse, GApp.model.ExpiringPhotoStatusResponse_.getTotal, RETURN_INTEGER_MAX_VALUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
 
-                //.method public final getAvailable()I
                 try{
-                    findAndHookMethod(class_ExpiringPhotoStatusResponse, "getAvailable", RETURN_INTEGER_MAX_VALUE);
+                    findAndHookMethod(class_ExpiringPhotoStatusResponse, GApp.model.ExpiringPhotoStatusResponse_.getAvailable, RETURN_INTEGER_MAX_VALUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -100,25 +93,24 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 - Last seen (exact date and time)
         */
         try{
-            Class<?> class_ProfileFieldsView = findClassIfExists(GRINDR_PKG + ".ui.profileV2.ProfileFieldsView", lpparam.classLoader);
-            Class<?> class_Profile = findClassIfExists(GRINDR_PKG + ".persistence.model.Profile", lpparam.classLoader);
-            Class<?> class_ExtendedProfileFieldView = findClassIfExists(GRINDR_PKG + ".view.bv", lpparam.classLoader);
-            Class<?> class_R_color = findClassIfExists(GRINDR_PKG + ".m$d", lpparam.classLoader);
-            Class<?> class_Styles = findClassIfExists(GRINDR_PKG + ".utils.bh", lpparam.classLoader);
+            Class<?> class_ProfileFieldsView = findClassIfExists(GApp.ui.profileV2.ProfileFieldsView, lpparam.classLoader);
+            Class<?> class_Profile = findClassIfExists(GApp.persistence.model.Profile, lpparam.classLoader);
+            Class<?> class_ExtendedProfileFieldView = findClassIfExists(GApp.view.ExtendedProfileFieldView, lpparam.classLoader);
+            Class<?> class_R_color = findClassIfExists(GApp.R.color, lpparam.classLoader);
+            Class<?> class_Styles = findClassIfExists(GApp.utils.Styles, lpparam.classLoader);
 
             findAndHookMethod(class_ProfileFieldsView, "setProfile", class_Profile, new XC_MethodHook() {
                 Object fieldsViewInstance;
                 Object context;
 
                 int labelColorId; //Label color cannot be assigned when the program has just been launched, since the data to be used is not created at this point.
-                final int valueColorId = getStaticIntField(class_R_color, "I"); //R.color.grindr_pure_white
+                final int valueColorId = getStaticIntField(class_R_color, GApp.R.color_.grindr_pure_white); //R.color.grindr_pure_white
 
                 private int getLabelColorId(){
-                    //'Styles' class singleton instance.
-                    Object stylesSingleton = getStaticObjectField(class_Styles, "a");
+                    Object stylesSingleton = getStaticObjectField(class_Styles, GApp.utils.Styles_.INSTANCE);
 
                     //Some color field reference (maybe 'pureWhite', not sure)
-                    return (int) callMethod(stylesSingleton, "f");
+                    return (int) callMethod(stylesSingleton, GApp.utils.Styles_._maybe_pureWhite);
                 }
 
                 private String toReadableDate(long timestamp){
@@ -145,11 +137,8 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                 private void addProfileFieldUi(CharSequence label, CharSequence value) {
                     Object extendedProfileFieldView = newInstance(class_ExtendedProfileFieldView, context);
 
-                    //public final fun setLabel(typeText: kotlin.CharSequence?, color: kotlin.Int /* = compiled code */): kotlin.Unit
-                    callMethod(extendedProfileFieldView, "a", label, labelColorId);
-
-                    //public final fun setValue(value: kotlin.CharSequence?, colorId: kotlin.Int /* = compiled code */): kotlin.Unit
-                    callMethod(extendedProfileFieldView, "b", value, valueColorId);
+                    callMethod(extendedProfileFieldView, GApp.view.ExtendedProfileFieldView_.setLabel, label, labelColorId);
+                    callMethod(extendedProfileFieldView, GApp.view.ExtendedProfileFieldView_.setValue, value, valueColorId);
 
                     //From View.setContentDescription(...)
                     callMethod(extendedProfileFieldView, "setContentDescription", value);
@@ -171,13 +160,10 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                     isXtra()Z to give Xtra account features.
                     isUnlimited()Z to give Unlimited account features.
             */
-
-            //"UserSession" class
-            Class<?> class_UserSession = findClassIfExists(GRINDR_PKG + ".storage.ai", lpparam.classLoader);
+            Class<?> class_UserSession = findClassIfExists(GApp.storage.UserSession, lpparam.classLoader);
             hookUserSessionImpl(class_UserSession);
 
-            //"UserSession2" class
-            Class<?> class_UserSession2 = findClassIfExists(GRINDR_PKG + ".storage.aj", lpparam.classLoader);
+            Class<?> class_UserSession2 = findClassIfExists(GApp.storage.UserSession2, lpparam.classLoader);
             hookUserSessionImpl(class_UserSession2);
         }
 
@@ -215,9 +201,9 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                         This hook allows the user to bypass this restriction.
                     */
                     try{
-                        Class<?> class_ChatRepo = findClass(GRINDR_PKG + ".persistence.repository.ChatRepo", lpparam.classLoader);
+                        Class<?> class_ChatRepo = findClass(GApp.persistence.repository.ChatRepo, lpparam.classLoader);
 
-                        findAndHookMethod(class_ChatRepo, "checkMessageForVideoCall", String.class, class_Continuation,
+                        findAndHookMethod(class_ChatRepo, GApp.persistence.repository.ChatRepo_.checkMessageForVideoCall, String.class, class_Continuation,
                                 XC_MethodReplacement.returnConstant(returnWrappedTrue));
                     }catch(Exception e){
                         XposedBridge.log(e);
@@ -232,11 +218,10 @@ public class GrindrHooker implements IXposedHookLoadPackage {
                     Allow to use SOME (not all of them) hidden features that Grindr developers have not yet made public or they are just testing.
                 */
                 try{
-                    Class<?> class_Experiments = findClass(GRINDR_PKG + ".experiment.Experiments", lpparam.classLoader);
-                    Class<?> class_IExperimentsManager = findClass(GRINDR_PKG + ".base.g.b", lpparam.classLoader);
+                    Class<?> class_Experiments = findClass(GApp.experiment.Experiments, lpparam.classLoader);
+                    Class<?> class_IExperimentsManager = findClass(GApp.base.Experiment.IExperimentManager, lpparam.classLoader);
 
-                    //public final fun uncheckedIsEnabled(expMgr: com.grindrapp.android.base.experiment.IExperimentsManager): kotlin.Boolean
-                    findAndHookMethod(class_Experiments, "a", class_IExperimentsManager, RETURN_TRUE);
+                    findAndHookMethod(class_Experiments, GApp.experiment.Experiments_.uncheckedIsEnabled_expMgr, class_IExperimentsManager, RETURN_TRUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
@@ -247,38 +232,33 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
     private void hookUserSessionImpl(Class<?> UserSessionImpl) {
         if(UserSessionImpl != null){
-            //public open fun hasFeature(feature: com.grindrapp.android.model.Feature): kotlin.Boolean
             try{
-                findAndHookMethod(UserSessionImpl, "a", class_Feature, RETURN_TRUE);
+                findAndHookMethod(UserSessionImpl, GApp.storage.IUserSession_.hasFeature_feature, class_Feature, RETURN_TRUE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
 
-            //public open fun isFree(): kotlin.Boolean
             try{
-                findAndHookMethod(UserSessionImpl, "i", RETURN_FALSE);
+                findAndHookMethod(UserSessionImpl, GApp.storage.IUserSession_.isFree, RETURN_FALSE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
 
-            //public open fun isNoXtraUpsell(): kotlin.Boolean
             //Not sure what is this for
             try{
-                findAndHookMethod(UserSessionImpl, "j", RETURN_FALSE);
+                findAndHookMethod(UserSessionImpl, GApp.storage.IUserSession_.isNoXtraUpsell, RETURN_FALSE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
 
-            //public open fun isXtra(): kotlin.Boolean
             try{
-                findAndHookMethod(UserSessionImpl, "k", RETURN_TRUE);
+                findAndHookMethod(UserSessionImpl, GApp.storage.IUserSession_.isXtra, RETURN_TRUE);
             }catch(Exception e){
                 XposedBridge.log(e);
             }
 
-            //public open fun isUnlimited(): kotlin.Boolean
             try{
-                findAndHookMethod(UserSessionImpl, "l", RETURN_TRUE);
+                findAndHookMethod(UserSessionImpl, GApp.storage.IUserSession_.isUnlimited, RETURN_TRUE);
             }catch(Exception e) {
                 XposedBridge.log(e);
             }
