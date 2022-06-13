@@ -1,14 +1,10 @@
 package com.eljaviluki.grindrplus;
 
-import static de.robv.android.xposed.XposedHelpers.callMethod;
-import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.findClassIfExists;
-import static de.robv.android.xposed.XposedHelpers.getLongField;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.getStaticIntField;
-import static de.robv.android.xposed.XposedHelpers.newInstance;
+import static com.eljaviluki.grindrplus.Constants.GRINDR_PKG;
+import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_FALSE;
+import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_INTEGER_MAX_VALUE;
+import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_TRUE;
+import static de.robv.android.xposed.XposedHelpers.*;
 
 import android.view.View;
 import android.view.Window;
@@ -25,11 +21,6 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class GrindrHooker implements IXposedHookLoadPackage {
-    static final XC_MethodReplacement RETURN_TRUE = XC_MethodReplacement.returnConstant(true);
-    static final XC_MethodReplacement RETURN_FALSE = XC_MethodReplacement.returnConstant(false);
-    static final XC_MethodReplacement RETURN_INTEGER_MAX_VALUE = XC_MethodReplacement.returnConstant(Integer.MAX_VALUE);
-    static final String GRINDR_PKG = "com.grindrapp.android";
-
     Class<?> class_Feature;
 
     @Override
@@ -70,7 +61,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
            Credit and thanks to @veeti!
         */
         {
-            XposedHelpers.findAndHookMethod(Window.class, "setFlags", int.class, int.class, new XC_MethodHook() {
+            findAndHookMethod(Window.class, "setFlags", int.class, int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
                     Integer flags = (Integer) param.args[0];
@@ -82,27 +73,17 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
         // Unlimited expiring photos
         {
-            /*
-                Hack Lcom/grindrapp/android/model/ExpiringPhotoStatusResponse;->total:I to give unlimited expiring photos.
-                Hack Lcom/grindrapp/android/model/ExpiringPhotoStatusResponse;->available:I to give unlimited expiring photos.
-            */
             Class<?> class_ExpiringPhotoStatusResponse = findClassIfExists(GRINDR_PKG + ".model.ExpiringPhotoStatusResponse", lpparam.classLoader);
 
             if(class_ExpiringPhotoStatusResponse != null){
-                /*
-                    Hook:   .method public final getTotal()I
-                        Make it return a constant value.
-                */
+                //.method public final getTotal()I
                 try{
                     findAndHookMethod(class_ExpiringPhotoStatusResponse, "getTotal", RETURN_INTEGER_MAX_VALUE);
                 }catch(Exception e){
                     XposedBridge.log(e);
                 }
 
-                /*
-                    Hook:   .method public final getAvailable()I
-                        Make it return a constant value.
-                */
+                //.method public final getAvailable()I
                 try{
                     findAndHookMethod(class_ExpiringPhotoStatusResponse, "getAvailable", RETURN_INTEGER_MAX_VALUE);
                 }catch(Exception e){
@@ -134,7 +115,7 @@ public class GrindrHooker implements IXposedHookLoadPackage {
 
                 private int getLabelColorId(){
                     //'Styles' class singleton instance.
-                    Object stylesSingleton = XposedHelpers.getStaticObjectField(class_Styles, "a");
+                    Object stylesSingleton = getStaticObjectField(class_Styles, "a");
 
                     //Some color field reference (maybe 'pureWhite', not sure)
                     return (int) callMethod(stylesSingleton, "f");
