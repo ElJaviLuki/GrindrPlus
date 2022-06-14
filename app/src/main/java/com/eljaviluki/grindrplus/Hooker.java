@@ -20,7 +20,7 @@ import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public class GrindrHooker implements IXposedHookLoadPackage {
+public class Hooker implements IXposedHookLoadPackage {
 
 
     Class<?> class_Feature;
