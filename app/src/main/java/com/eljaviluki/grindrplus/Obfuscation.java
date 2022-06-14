@@ -19,7 +19,7 @@ public class Obfuscation {
 
             public static final String Experiments = _experiment + ".Experiments";
             public static class Experiments_ {
-                public static final String uncheckedIsEnabled_expMgr = Experiments + ".a";
+                public static final String uncheckedIsEnabled_expMgr = "a";
             }
         }
 
