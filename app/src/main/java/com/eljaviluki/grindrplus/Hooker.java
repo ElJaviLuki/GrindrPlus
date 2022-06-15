@@ -26,7 +26,7 @@ public class Hooker implements IXposedHookLoadPackage {
 
                 Hooks.hookFeatureGranting();
                 Hooks.allowScreenshotsHook();
-                //Hooks.unlimitedExpiringPhotos();
+                Hooks.unlimitedExpiringPhotos();
                 Hooks.addExtraProfileFields();
                 Hooks.hookUserSessionImpl();
                 Hooks.allowMockProvider();
