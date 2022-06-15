@@ -13,6 +13,8 @@ import static de.robv.android.xposed.XposedHelpers.getStaticIntField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 import static de.robv.android.xposed.XposedHelpers.newInstance;
 
+import com.eljaviluki.grindrplus.Obfuscation.GApp;
+
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -47,24 +49,24 @@ public class Hooks {
             - Last seen (exact date and time)
     */
     public static void addExtraProfileFields() {
-        Class<?> class_ProfileFieldsView = findClass(Obfuscation.GApp.ui.profileV2.ProfileFieldsView, Hooker.pkgParam.classLoader);
-        Class<?> class_Profile = findClass(Obfuscation.GApp.persistence.model.Profile, Hooker.pkgParam.classLoader);
-        Class<?> class_ExtendedProfileFieldView = findClass(Obfuscation.GApp.view.ExtendedProfileFieldView, Hooker.pkgParam.classLoader);
-        Class<?> class_R_color = findClass(Obfuscation.GApp.R.color, Hooker.pkgParam.classLoader);
-        Class<?> class_Styles = findClass(Obfuscation.GApp.utils.Styles, Hooker.pkgParam.classLoader);
+        Class<?> class_ProfileFieldsView = findClass(GApp.ui.profileV2.ProfileFieldsView, Hooker.pkgParam.classLoader);
+        Class<?> class_Profile = findClass(GApp.persistence.model.Profile, Hooker.pkgParam.classLoader);
+        Class<?> class_ExtendedProfileFieldView = findClass(GApp.view.ExtendedProfileFieldView, Hooker.pkgParam.classLoader);
+        Class<?> class_R_color = findClass(GApp.R.color, Hooker.pkgParam.classLoader);
+        Class<?> class_Styles = findClass(GApp.utils.Styles, Hooker.pkgParam.classLoader);
 
         findAndHookMethod(class_ProfileFieldsView, "setProfile", class_Profile, new XC_MethodHook() {
             Object fieldsViewInstance;
             Object context;
 
             int labelColorId; //Label color cannot be assigned when the program has just been launched, since the data to be used is not created at this point.
-            final int valueColorId = getStaticIntField(class_R_color, Obfuscation.GApp.R.color_.grindr_pure_white); //R.color.grindr_pure_white
+            final int valueColorId = getStaticIntField(class_R_color, GApp.R.color_.grindr_pure_white); //R.color.grindr_pure_white
 
             private int getLabelColorId(){
-                Object stylesSingleton = getStaticObjectField(class_Styles, Obfuscation.GApp.utils.Styles_.INSTANCE);
+                Object stylesSingleton = getStaticObjectField(class_Styles, GApp.utils.Styles_.INSTANCE);
 
                 //Some color field reference (maybe 'pureWhite', not sure)
-                return (int) callMethod(stylesSingleton, Obfuscation.GApp.utils.Styles_._maybe_pureWhite);
+                return (int) callMethod(stylesSingleton, GApp.utils.Styles_._maybe_pureWhite);
             }
 
             @Override
@@ -87,8 +89,8 @@ public class Hooks {
             private void addProfileFieldUi(CharSequence label, CharSequence value) {
                 Object extendedProfileFieldView = newInstance(class_ExtendedProfileFieldView, context);
 
-                callMethod(extendedProfileFieldView, Obfuscation.GApp.view.ExtendedProfileFieldView_.setLabel, label, labelColorId);
-                callMethod(extendedProfileFieldView, Obfuscation.GApp.view.ExtendedProfileFieldView_.setValue, value, valueColorId);
+                callMethod(extendedProfileFieldView, GApp.view.ExtendedProfileFieldView_.setLabel, label, labelColorId);
+                callMethod(extendedProfileFieldView, GApp.view.ExtendedProfileFieldView_.setValue, value, valueColorId);
 
                 //From View.setContentDescription(...)
                 callMethod(extendedProfileFieldView, "setContentDescription", value);
@@ -108,25 +110,25 @@ public class Hooks {
     */
     public static void hookUserSessionImpl() {
         List<Class<?>> classes = new ArrayList<>();
-        classes.add(findClass(Obfuscation.GApp.storage.UserSession, Hooker.pkgParam.classLoader));
-        classes.add(findClass(Obfuscation.GApp.storage.UserSession2, Hooker.pkgParam.classLoader));
+        classes.add(findClass(GApp.storage.UserSession, Hooker.pkgParam.classLoader));
+        classes.add(findClass(GApp.storage.UserSession2, Hooker.pkgParam.classLoader));
 
         //Apply the hook to all the classes using lambda expressions
-        Class<?> class_Feature = findClass(Obfuscation.GApp.model.Feature, Hooker.pkgParam.classLoader);
+        Class<?> class_Feature = findClass(GApp.model.Feature, Hooker.pkgParam.classLoader);
         classes.forEach(class_ -> {
-            findAndHookMethod(class_, Obfuscation.GApp.storage.IUserSession_.hasFeature_feature, class_Feature, RETURN_TRUE);
+            findAndHookMethod(class_, GApp.storage.IUserSession_.hasFeature_feature, class_Feature, RETURN_TRUE);
 
-            findAndHookMethod(class_, Obfuscation.GApp.storage.IUserSession_.isFree, RETURN_FALSE);
-            findAndHookMethod(class_, Obfuscation.GApp.storage.IUserSession_.isNoXtraUpsell, RETURN_FALSE); //Not sure what is this for
-            findAndHookMethod(class_, Obfuscation.GApp.storage.IUserSession_.isXtra, RETURN_TRUE);
-            findAndHookMethod(class_, Obfuscation.GApp.storage.IUserSession_.isUnlimited, RETURN_TRUE);
+            findAndHookMethod(class_, GApp.storage.IUserSession_.isFree, RETURN_FALSE);
+            findAndHookMethod(class_, GApp.storage.IUserSession_.isNoXtraUpsell, RETURN_FALSE); //Not sure what is this for
+            findAndHookMethod(class_, GApp.storage.IUserSession_.isXtra, RETURN_TRUE);
+            findAndHookMethod(class_, GApp.storage.IUserSession_.isUnlimited, RETURN_TRUE);
         });
     }
 
     public static void unlimitedExpiringPhotos() {
-        Class<?> class_ExpiringPhotoStatusResponse = findClass(Obfuscation.GApp.model.ExpiringPhotoStatusResponse, Hooker.pkgParam.classLoader);
-        findAndHookMethod(class_ExpiringPhotoStatusResponse, Obfuscation.GApp.model.ExpiringPhotoStatusResponse_.getTotal, RETURN_INTEGER_MAX_VALUE);
-        findAndHookMethod(class_ExpiringPhotoStatusResponse, Obfuscation.GApp.model.ExpiringPhotoStatusResponse_.getAvailable, RETURN_INTEGER_MAX_VALUE);
+        Class<?> class_ExpiringPhotoStatusResponse = findClass(GApp.model.ExpiringPhotoStatusResponse, Hooker.pkgParam.classLoader);
+        findAndHookMethod(class_ExpiringPhotoStatusResponse, GApp.model.ExpiringPhotoStatusResponse_.getTotal, RETURN_INTEGER_MAX_VALUE);
+        findAndHookMethod(class_ExpiringPhotoStatusResponse, GApp.model.ExpiringPhotoStatusResponse_.getAvailable, RETURN_INTEGER_MAX_VALUE);
     }
 
     /**
@@ -134,14 +136,14 @@ public class Hooks {
         A few more changes may be needed to use all the features.
     */
     public static void hookFeatureGranting() {
-        Class<?> class_Feature = findClass(Obfuscation.GApp.model.Feature, Hooker.pkgParam.classLoader);
-        findAndHookMethod(class_Feature, Obfuscation.GApp.model.Feature_.isGranted, RETURN_TRUE);
-        findAndHookMethod(class_Feature, Obfuscation.GApp.model.Feature_.isNotGranted, RETURN_FALSE);
+        Class<?> class_Feature = findClass(GApp.model.Feature, Hooker.pkgParam.classLoader);
+        findAndHookMethod(class_Feature, GApp.model.Feature_.isGranted, RETURN_TRUE);
+        findAndHookMethod(class_Feature, GApp.model.Feature_.isNotGranted, RETURN_FALSE);
 
 
-        Class<?> class_IUserSession = findClass(Obfuscation.GApp.storage.IUserSession, Hooker.pkgParam.classLoader);
-        findAndHookMethod(class_Feature, Obfuscation.GApp.model.Feature_.isGranted, class_IUserSession, RETURN_TRUE);
-        findAndHookMethod(class_Feature, Obfuscation.GApp.model.Feature_.isNotGranted, class_IUserSession, RETURN_FALSE);
+        Class<?> class_IUserSession = findClass(GApp.storage.IUserSession, Hooker.pkgParam.classLoader);
+        findAndHookMethod(class_Feature, GApp.model.Feature_.isGranted, class_IUserSession, RETURN_TRUE);
+        findAndHookMethod(class_Feature, GApp.model.Feature_.isNotGranted, class_IUserSession, RETURN_FALSE);
     }
 
     /**
@@ -149,9 +151,9 @@ public class Hooks {
      or they are just testing.
      */
     public static void allowSomeExperiments() {
-        Class<?> class_Experiments = findClass(Obfuscation.GApp.experiment.Experiments, Hooker.pkgParam.classLoader);
-        Class<?> class_IExperimentsManager = findClass(Obfuscation.GApp.base.Experiment.IExperimentManager, Hooker.pkgParam.classLoader);
-        findAndHookMethod(class_Experiments, Obfuscation.GApp.experiment.Experiments_.uncheckedIsEnabled_expMgr, class_IExperimentsManager, RETURN_TRUE);
+        Class<?> class_Experiments = findClass(GApp.experiment.Experiments, Hooker.pkgParam.classLoader);
+        Class<?> class_IExperimentsManager = findClass(GApp.base.Experiment.IExperimentManager, Hooker.pkgParam.classLoader);
+        findAndHookMethod(class_Experiments, GApp.experiment.Experiments_.uncheckedIsEnabled_expMgr, class_IExperimentsManager, RETURN_TRUE);
     }
 
     /**
@@ -165,10 +167,10 @@ public class Hooks {
         Class<?> class_Continuation = findClass("kotlin.coroutines.Continuation", Hooker.pkgParam.classLoader);
         Class<?> class_Boxing = findClass("kotlin.coroutines.jvm.internal.Boxing", Hooker.pkgParam.classLoader);
 
-        Class<?> class_ChatRepo = findClass(Obfuscation.GApp.persistence.repository.ChatRepo, Hooker.pkgParam.classLoader);
+        Class<?> class_ChatRepo = findClass(GApp.persistence.repository.ChatRepo, Hooker.pkgParam.classLoader);
 
         Object returnWrappedTrue = callStaticMethod(class_Boxing, "boxBoolean", true);
-        findAndHookMethod(class_ChatRepo, Obfuscation.GApp.persistence.repository.ChatRepo_.checkMessageForVideoCall, String.class, class_Continuation, XC_MethodReplacement.returnConstant(returnWrappedTrue));
+        findAndHookMethod(class_ChatRepo, GApp.persistence.repository.ChatRepo_.checkMessageForVideoCall, String.class, class_Continuation, XC_MethodReplacement.returnConstant(returnWrappedTrue));
     }
 
     /**
