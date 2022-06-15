@@ -1,15 +1,23 @@
 package com.eljaviluki.grindrplus;
 
-import static com.eljaviluki.grindrplus.Constants.Returns.*;
-import static de.robv.android.xposed.XposedHelpers.*;
+import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_FALSE;
+import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_INTEGER_MAX_VALUE;
+import static com.eljaviluki.grindrplus.Constants.Returns.RETURN_TRUE;
+import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
+import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getLongField;
+import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.getStaticIntField;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+import static de.robv.android.xposed.XposedHelpers.newInstance;
 
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -59,10 +67,6 @@ public class Hooks {
                 return (int) callMethod(stylesSingleton, Obfuscation.GApp.utils.Styles_._maybe_pureWhite);
             }
 
-            private String toReadableDate(long timestamp){
-                return SimpleDateFormat.getDateTimeInstance().format(new Date(timestamp));
-            }
-
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
                 fieldsViewInstance = param.thisObject;
@@ -74,7 +78,7 @@ public class Hooks {
                 Object profile = param.args[0];
 
                 addProfileFieldUi("Profile ID", (CharSequence) getObjectField(profile, "profileId"));
-                addProfileFieldUi("Last Seen", toReadableDate(getLongField(profile, "seen")));
+                addProfileFieldUi("Last Seen", Utils.toReadableDate(getLongField(profile, "seen")));
 
                 //.setVisibility() of param.thisObject to always VISIBLE (otherwise if the profile has no fields, the additional ones will not be shown)
                 callMethod(param.thisObject, "setVisibility", View.VISIBLE);
