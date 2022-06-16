@@ -1,27 +1,13 @@
 package com.eljaviluki.grindrplus
 
-import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedHelpers
 import android.view.View
 import android.view.Window
 import de.robv.android.xposed.XC_MethodHook
 import android.view.WindowManager
-import com.eljaviluki.grindrplus.Obfuscation.GApp.ui.profileV2
-import com.eljaviluki.grindrplus.Obfuscation.GApp.view
-import com.eljaviluki.grindrplus.Obfuscation.GApp.utils
-import com.eljaviluki.grindrplus.Obfuscation.GApp.R.color_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.utils.Styles_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.view.ExtendedProfileFieldView_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.storage
-import com.eljaviluki.grindrplus.Obfuscation.GApp.storage.IUserSession_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.model.ExpiringPhotoStatusResponse_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.model.Feature_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.experiment
-import com.eljaviluki.grindrplus.Obfuscation.GApp.base.Experiment
-import com.eljaviluki.grindrplus.Obfuscation.GApp.experiment.Experiments_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.persistence.repository
-import com.eljaviluki.grindrplus.Obfuscation.GApp.persistence.repository.ChatRepo_
-import com.eljaviluki.grindrplus.Obfuscation.GApp.persistence
+import com.eljaviluki.grindrplus.Obfuscation.GApp
+import de.robv.android.xposed.XC_MethodReplacement
+import kotlin.coroutines.Continuation
 
 object Hooks {
     /**
@@ -52,23 +38,23 @@ object Hooks {
      */
     fun addExtraProfileFields() {
         val class_ProfileFieldsView = XposedHelpers.findClass(
-            profileV2.ProfileFieldsView,
+            GApp.ui.profileV2.ProfileFieldsView,
             Hooker.pkgParam!!.classLoader
         )
         val class_Profile = XposedHelpers.findClass(
-            persistence.model.Profile,
+            GApp.persistence.model.Profile,
             Hooker.pkgParam!!.classLoader
         )
         val class_ExtendedProfileFieldView = XposedHelpers.findClass(
-            view.ExtendedProfileFieldView,
+            GApp.view.ExtendedProfileFieldView,
             Hooker.pkgParam!!.classLoader
         )
         val class_R_color = XposedHelpers.findClass(
-            Obfuscation.GApp.R.color,
+            GApp.R.color,
             Hooker.pkgParam!!.classLoader
         )
         val class_Styles =
-            XposedHelpers.findClass(utils.Styles, Hooker.pkgParam!!.classLoader)
+            XposedHelpers.findClass(GApp.utils.Styles, Hooker.pkgParam!!.classLoader)
         XposedHelpers.findAndHookMethod(
             class_ProfileFieldsView,
             "setProfile",
@@ -80,17 +66,17 @@ object Hooks {
                         = 0
                 val valueColorId = XposedHelpers.getStaticIntField(
                     class_R_color,
-                    color_.grindr_pure_white
+                    GApp.R.color_.grindr_pure_white
                 ) //R.color.grindr_pure_white
 
                 private fun obtainLabelColorId(): Int {
                     val stylesSingleton =
-                        XposedHelpers.getStaticObjectField(class_Styles, Styles_.INSTANCE)
+                        XposedHelpers.getStaticObjectField(class_Styles, GApp.utils.Styles_.INSTANCE)
 
                     //Some color field reference (maybe 'pureWhite', not sure)
                     return XposedHelpers.callMethod(
                         stylesSingleton,
-                        Styles_._maybe_pureWhite
+                        GApp.utils.Styles_._maybe_pureWhite
                     ) as Int
                 }
 
@@ -122,13 +108,13 @@ object Hooks {
                         XposedHelpers.newInstance(class_ExtendedProfileFieldView, context)
                     XposedHelpers.callMethod(
                         extendedProfileFieldView,
-                        ExtendedProfileFieldView_.setLabel,
+                        GApp.view.ExtendedProfileFieldView_.setLabel,
                         label,
                         labelColorId
                     )
                     XposedHelpers.callMethod(
                         extendedProfileFieldView,
-                        ExtendedProfileFieldView_.setValue,
+                        GApp.view.ExtendedProfileFieldView_.setValue,
                         value,
                         valueColorId
                     )
@@ -160,46 +146,51 @@ object Hooks {
     fun hookUserSessionImpl() {
         val classes = listOf(
             XposedHelpers.findClass(
-            storage.UserSession,
-            Hooker.pkgParam!!.classLoader
-        ),
+                GApp.storage.UserSession,
+                Hooker.pkgParam!!.classLoader
+            ),
             XposedHelpers.findClass(
-            storage.UserSession2,
-            Hooker.pkgParam!!.classLoader
-        ))
+                GApp.storage.UserSession2,
+                Hooker.pkgParam!!.classLoader
+            )
+        )
         
 
         //Apply the hook to all the classes using lambda expressions
         val class_Feature = XposedHelpers.findClass(
-            Obfuscation.GApp.model.Feature,
+            GApp.model.Feature,
             Hooker.pkgParam!!.classLoader
         )
 
         classes.forEach {
             XposedHelpers.findAndHookMethod(
                 it,
-                IUserSession_.hasFeature_feature,
+                GApp.storage.IUserSession_.hasFeature_feature,
                 class_Feature,
                 Constants.Returns.RETURN_TRUE
             )
+
             XposedHelpers.findAndHookMethod(
                 it,
-                IUserSession_.isFree,
+                GApp.storage.IUserSession_.isFree,
                 Constants.Returns.RETURN_FALSE
             )
+
             XposedHelpers.findAndHookMethod(
                 it,
-                IUserSession_.isNoXtraUpsell,
+                GApp.storage.IUserSession_.isNoXtraUpsell,
                 Constants.Returns.RETURN_FALSE
             ) //Not sure what is this for
+
             XposedHelpers.findAndHookMethod(
                 it,
-                IUserSession_.isXtra,
+                GApp.storage.IUserSession_.isXtra,
                 Constants.Returns.RETURN_TRUE
             )
+
             XposedHelpers.findAndHookMethod(
                 it,
-                IUserSession_.isUnlimited,
+                GApp.storage.IUserSession_.isUnlimited,
                 Constants.Returns.RETURN_TRUE
             )
         }
@@ -207,17 +198,17 @@ object Hooks {
 
     fun unlimitedExpiringPhotos() {
         val class_ExpiringPhotoStatusResponse = XposedHelpers.findClass(
-            Obfuscation.GApp.model.ExpiringPhotoStatusResponse,
+            GApp.model.ExpiringPhotoStatusResponse,
             Hooker.pkgParam!!.classLoader
         )
         XposedHelpers.findAndHookMethod(
             class_ExpiringPhotoStatusResponse,
-            ExpiringPhotoStatusResponse_.getTotal,
+            GApp.model.ExpiringPhotoStatusResponse_.getTotal,
             Constants.Returns.RETURN_INTEGER_MAX_VALUE
         )
         XposedHelpers.findAndHookMethod(
             class_ExpiringPhotoStatusResponse,
-            ExpiringPhotoStatusResponse_.getAvailable,
+            GApp.model.ExpiringPhotoStatusResponse_.getAvailable,
             Constants.Returns.RETURN_INTEGER_MAX_VALUE
         )
     }
@@ -228,30 +219,30 @@ object Hooks {
      */
     fun hookFeatureGranting() {
         val class_Feature = XposedHelpers.findClass(
-            Obfuscation.GApp.model.Feature,
+            GApp.model.Feature,
             Hooker.pkgParam!!.classLoader
         )
         XposedHelpers.findAndHookMethod(
             class_Feature,
-            Feature_.isGranted,
+            GApp.model.Feature_.isGranted,
             Constants.Returns.RETURN_TRUE
         )
         XposedHelpers.findAndHookMethod(
             class_Feature,
-            Feature_.isNotGranted,
+            GApp.model.Feature_.isNotGranted,
             Constants.Returns.RETURN_FALSE
         )
         val class_IUserSession =
-            XposedHelpers.findClass(storage.IUserSession, Hooker.pkgParam!!.classLoader)
+            XposedHelpers.findClass(GApp.storage.IUserSession, Hooker.pkgParam!!.classLoader)
         XposedHelpers.findAndHookMethod(
             class_Feature,
-            Feature_.isGranted,
+            GApp.model.Feature_.isGranted,
             class_IUserSession,
             Constants.Returns.RETURN_TRUE
         )
         XposedHelpers.findAndHookMethod(
             class_Feature,
-            Feature_.isNotGranted,
+            GApp.model.Feature_.isNotGranted,
             class_IUserSession,
             Constants.Returns.RETURN_FALSE
         )
@@ -263,14 +254,14 @@ object Hooks {
      */
     fun allowSomeExperiments() {
         val class_Experiments =
-            XposedHelpers.findClass(experiment.Experiments, Hooker.pkgParam!!.classLoader)
+            XposedHelpers.findClass(GApp.experiment.Experiments, Hooker.pkgParam!!.classLoader)
         val class_IExperimentsManager = XposedHelpers.findClass(
-            Experiment.IExperimentManager,
+            GApp.base.Experiment.IExperimentManager,
             Hooker.pkgParam!!.classLoader
         )
         XposedHelpers.findAndHookMethod(
             class_Experiments,
-            Experiments_.uncheckedIsEnabled_expMgr,
+            GApp.experiment.Experiments_.uncheckedIsEnabled_expMgr,
             class_IExperimentsManager,
             Constants.Returns.RETURN_TRUE
         )
@@ -283,24 +274,19 @@ object Hooks {
      * This hook allows the user to bypass this restriction.
      */
     fun allowVideocallsOnEmptyChats() {
-        //Find Kotlin utils
         val class_Continuation = XposedHelpers.findClass(
             "kotlin.coroutines.Continuation",
             Hooker.pkgParam!!.classLoader
-        )
-        val class_Boxing = XposedHelpers.findClass(
-            "kotlin.coroutines.jvm.internal.Boxing",
-            Hooker.pkgParam!!.classLoader
-        )
+        ) //I tried using Continuation::class.java, but that only gives a different Class instance (does not work)
+
         val class_ChatRepo =
-            XposedHelpers.findClass(repository.ChatRepo, Hooker.pkgParam!!.classLoader)
-        val returnWrappedTrue = XposedHelpers.callStaticMethod(class_Boxing, "boxBoolean", true)
+            XposedHelpers.findClass(GApp.persistence.repository.ChatRepo, Hooker.pkgParam!!.classLoader)
         XposedHelpers.findAndHookMethod(
             class_ChatRepo,
-            ChatRepo_.checkMessageForVideoCall,
+            GApp.persistence.repository.ChatRepo_.checkMessageForVideoCall,
             String::class.java,
             class_Continuation,
-            XC_MethodReplacement.returnConstant(returnWrappedTrue)
+            XC_MethodReplacement.returnConstant(true)
         )
     }
 
@@ -314,6 +300,7 @@ object Hooks {
             "android.location.Location",
             Hooker.pkgParam!!.classLoader
         )
+        
         XposedHelpers.findAndHookMethod(
             class_Location,
             "isFromMockProvider",
