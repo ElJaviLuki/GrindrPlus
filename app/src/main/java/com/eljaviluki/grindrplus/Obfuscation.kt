@@ -61,7 +61,7 @@ class Obfuscation {
 
             const val color = "$_R\$d"
             object color_ {
-                const val grindr_pure_white = "I"
+                const val grindr_pure_white = "L"
             }
         }
 
