@@ -5,8 +5,11 @@ import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import kotlin.time.Duration.Companion.minutes
+
 
 class Hooker : IXposedHookLoadPackage {
+
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
         if (lpparam.packageName != Constants.GRINDR_PKG) return
         pkgParam = lpparam
@@ -25,6 +28,9 @@ class Hooker : IXposedHookLoadPackage {
                     Hooks.allowMockProvider()
                     Hooks.allowVideocallsOnEmptyChats()
                     Hooks.allowSomeExperiments()
+
+                    //I've set this to max 3 min. If we make an UI for Hook Settings, we'll let the user to change this.
+                    Hooks.hookOnlineIndicatorDuration(3.minutes)
                 }
             })
     }

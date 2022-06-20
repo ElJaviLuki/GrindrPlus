@@ -7,7 +7,9 @@ import de.robv.android.xposed.XC_MethodHook
 import android.view.WindowManager
 import com.eljaviluki.grindrplus.Obfuscation.GApp
 import de.robv.android.xposed.XC_MethodReplacement
+import java.nio.channels.GatheringByteChannel
 import kotlin.coroutines.Continuation
+import kotlin.time.Duration
 
 object Hooks {
     /**
@@ -306,5 +308,28 @@ object Hooks {
             "isFromMockProvider",
             Constants.Returns.RETURN_FALSE
         )
+    }
+
+
+    /**
+     * Hook online indicator duration:
+     *
+     * "After closing the app, the profile remains online for 10 minutes. It is misleading. People think that you are rude for not answering, when in reality you are not online."
+     *
+     * Now, you can limit the Online indicator (green dot) for a custom duration.
+     *
+     * Inspired in the suggestion made at:
+     * https://grindr.uservoice.com/forums/912631-grindr-feedback/suggestions/34555780-more-accurate-online-status-go-offline-when-clos
+     *
+     * @param duration Duration in milliseconds.
+     *
+     * @see Duration
+     * @see Duration.inWholeMilliseconds
+     *
+     * @author ElJaviLuki
+     */
+    fun hookOnlineIndicatorDuration(duration : Duration){
+        val class_ProfileUtils = XposedHelpers.findClass(GApp.utils.ProfileUtils, Hooker.pkgParam!!.classLoader)
+        XposedHelpers.setStaticLongField(class_ProfileUtils, GApp.utils.ProfileUtils_.onlineIndicatorDuration, duration.inWholeMilliseconds)
     }
 }

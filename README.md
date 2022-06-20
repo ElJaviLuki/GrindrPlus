@@ -14,6 +14,7 @@ Grindr Plus is a Xposed Module that allows you to unlock some features in Grindr
 - Extra profile fields in the so-called CruiseViewHolder ('Profile ID', and exact time of 'Last seen')
 - Make videocalls even if you didn't start a chat with the recipient.
 - Access to some user-hidden features (developer features)
+- More accurate online status from other users. (The green dot from other profiles goes off after 3 minutes of inactivity.)
 
 ## Bugs
 * Incognito mode is kinda buggy (it turns off after a little while)

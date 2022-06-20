@@ -99,6 +99,11 @@ class Obfuscation {
                 const val INSTANCE = "a"
                 const val _maybe_pureWhite = "f"
             }
+
+            const val ProfileUtils = "$_utils.at"
+            object ProfileUtils_ {
+                const val onlineIndicatorDuration = "b"
+            }
         }
 
         object view {
