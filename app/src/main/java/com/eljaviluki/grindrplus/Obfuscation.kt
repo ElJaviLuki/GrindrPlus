@@ -6,16 +6,16 @@ object Obfuscation {
             private const val _base = Constants.GRINDR_PKG + ".base"
 
             object Experiment {
-                private const val _experiment = "$_base.g"
+                private const val _experiment = "$_base.f"
 
                 const val IExperimentsManager = "$_experiment.b"
             }
         }
 
         object experiment {
-            private const val _experiment = Constants.GRINDR_PKG + ".experiment"
+            private const val _experiment = Constants.GRINDR_PKG + ".j"
 
-            const val Experiments = "$_experiment.Experiments"
+            const val Experiments = "$_experiment.b"
             object Experiments_ {
                 const val uncheckedIsEnabled_expMgr = "a"
             }
@@ -67,12 +67,12 @@ object Obfuscation {
         }
 
         object R {
-            private const val _R = Constants.GRINDR_PKG + ".m"
+            private const val _R = Constants.GRINDR_PKG + ".o"
 
             const val color = "$_R\$d"
             object color_ {
-                const val grindr_gold_star_gay = "w"
-                const val grindr_pure_white = "L"
+                const val grindr_gold_star_gay = "x"
+                const val grindr_pure_white = "M"
             }
         }
 
@@ -85,10 +85,11 @@ object Obfuscation {
             const val IUserSession = "$_storage.IUserSession"
             object IUserSession_ {
                 const val hasFeature_feature = "a"
-                const val isFree = "i"
-                const val isNoXtraUpsell = "j"
-                const val isXtra = "k"
-                const val isUnlimited = "l"
+                const val isFree = "j"
+                const val isNoXtraUpsell = "k"
+                const val isXtra = "l"
+                const val isUnlimited = "m"
+                const val isSubscriber = "n"
             }
         }
 
@@ -108,7 +109,7 @@ object Obfuscation {
         object utils {
             private const val _utils = Constants.GRINDR_PKG + ".utils"
 
-            const val ProfileUtils = "$_utils.at"
+            const val ProfileUtils = "$_utils.as"
             object ProfileUtils_ {
                 const val onlineIndicatorDuration = "b"
             }
