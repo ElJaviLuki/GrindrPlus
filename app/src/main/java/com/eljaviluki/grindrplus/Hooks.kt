@@ -2,15 +2,15 @@ package com.eljaviluki.grindrplus
 
 import android.view.View
 import android.view.Window
-import de.robv.android.xposed.XC_MethodHook
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
-import com.eljaviluki.grindrplus.Constants.Returns.RETURN_TRUE
 import com.eljaviluki.grindrplus.Constants.Returns.RETURN_FALSE
 import com.eljaviluki.grindrplus.Constants.Returns.RETURN_INTEGER_MAX_VALUE
 import com.eljaviluki.grindrplus.Constants.Returns.RETURN_LONG_MAX_VALUE
+import com.eljaviluki.grindrplus.Constants.Returns.RETURN_TRUE
 import com.eljaviluki.grindrplus.Obfuscation.GApp
 import com.eljaviluki.grindrplus.decorated.persistence.model.Profile
+import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers.*
 import kotlin.time.Duration
 
@@ -215,6 +215,12 @@ object Hooks {
                 GApp.storage.IUserSession_.isUnlimited,
                 RETURN_TRUE
             )
+
+            findAndHookMethod(
+                userSessionImpl,
+                GApp.storage.IUserSession_.isSubscriber,
+                RETURN_TRUE
+            )
         }
     }
 
@@ -338,7 +344,7 @@ object Hooks {
             "android.location.Location",
             Hooker.pkgParam.classLoader
         )
-        
+
         findAndHookMethod(
             class_Location,
             "isFromMockProvider",
