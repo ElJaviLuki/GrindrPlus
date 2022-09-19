@@ -7,11 +7,13 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.eljaviluki.grindrplus"
+        applicationId 'com.eljaviluki.grindrplus'
         minSdk 21
         targetSdk 32
         versionCode 4
-        versionName "1.1-1.17.1"
+        versionName '1.2'
+        applicationIdSuffix '8.17.1'
+        versionNameSuffix 'for 8.17.1'
     }
 
     buildTypes {
