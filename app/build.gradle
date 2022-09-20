@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 32
         versionCode 4
-        versionName '1.2'
+        versionName '1.1'
         applicationIdSuffix '8.17.1'
         versionNameSuffix 'for 8.17.1'
     }
