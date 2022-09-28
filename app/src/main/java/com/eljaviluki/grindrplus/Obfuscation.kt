@@ -71,7 +71,7 @@ object Obfuscation {
             const val color = "$_R.h0"
             object color_ {
                 const val grindr_gold_star_gay = "x"
-                const val grindr_pure_white = "M"
+                const val grindr_pure_white = "O"
             }
         }
 
@@ -107,7 +107,7 @@ object Obfuscation {
         object utils {
             private const val _utils = Constants.GRINDR_PKG + ".utils"
 
-            const val ProfileUtils = "$_utils.u0"
+            const val ProfileUtils = "$_utils.t0"
             object ProfileUtils_ {
                 const val onlineIndicatorDuration = "b"
             }
@@ -116,7 +116,7 @@ object Obfuscation {
         object view {
             private const val _view = Constants.GRINDR_PKG + ".view"
 
-            const val ExtendedProfileFieldView = "$_view.d4"
+            const val ExtendedProfileFieldView = "$_view.i4"
             object ExtendedProfileFieldView_ {
                 const val setLabel = "l"
                 const val setValue = "n"
