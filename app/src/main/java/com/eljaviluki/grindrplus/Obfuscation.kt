@@ -70,24 +70,24 @@ object Obfuscation {
 
             const val color = "$_R.h0"
             object color_ {
-                const val grindr_gold_star_gay = "x"
-                const val grindr_pure_white = "O"
+                const val grindr_gold_star_gay = "y"
+                const val grindr_pure_white = "P"
             }
         }
 
         object storage {
             private const val _storage = Constants.GRINDR_PKG + ".storage"
 
-            const val UserSession = "$_storage.w0"
-            const val UserSession2 = "$_storage.x0"
+            const val UserSession = "$_storage.v0"
+            const val UserSession2 = "$_storage.w0"
 
             const val IUserSession = "$_storage.IUserSession"
             object IUserSession_ {
                 const val hasFeature_feature = "a"
-                const val isFree = "j"
-                const val isNoXtraUpsell = "p"
-                const val isXtra = "g"
-                const val isUnlimited = "q"
+                const val isFree = "i"
+                const val isNoXtraUpsell = "o"
+                const val isXtra = "f"
+                const val isUnlimited = "p"
             }
         }
 
@@ -116,7 +116,7 @@ object Obfuscation {
         object view {
             private const val _view = Constants.GRINDR_PKG + ".view"
 
-            const val ExtendedProfileFieldView = "$_view.i4"
+            const val ExtendedProfileFieldView = "$_view.k4"
             object ExtendedProfileFieldView_ {
                 const val setLabel = "l"
                 const val setValue = "n"
@@ -124,7 +124,7 @@ object Obfuscation {
 
             const val TapsAnimLayout = "$_view.TapsAnimLayout"
             object TapsAnimLayout_ {
-                const val tapType = "h"
+                const val tapType = "i"
 
                 const val getCanSelectVariants = "getCanSelectVariants"
                 const val getDisableVariantSelection = "getDisableVariantSelection"
