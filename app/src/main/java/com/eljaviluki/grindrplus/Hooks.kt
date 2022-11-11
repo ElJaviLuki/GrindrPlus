@@ -214,12 +214,12 @@ object Hooks {
             findClass(
                 GApp.storage.UserSession,
                 Hooker.pkgParam.classLoader
-            ),
+            ) //,
 
-            findClass(
-                GApp.storage.UserSession2,
-                Hooker.pkgParam.classLoader
-            )
+//            findClass(
+//                GApp.storage.UserSession2,
+//                Hooker.pkgParam.classLoader
+//            )
         ).forEach { userSessionImpl ->
             findAndHookMethod(
                 userSessionImpl,
