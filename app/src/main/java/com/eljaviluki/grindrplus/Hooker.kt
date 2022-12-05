@@ -78,11 +78,11 @@ class Hooker : IXposedHookLoadPackage {
 //                        e.message?.let { Logger.xLog(it) }
 //                    }
 
-//                    try {
-//                        Hooks.allowSomeExperiments()
-//                    } catch (e : Exception) {
-//                        e.message?.let { Logger.xLog(it) }
-//                    }
+                    try {
+                        Hooks.allowSomeExperiments()
+                    } catch (e : Exception) {
+                        e.message?.let { Logger.xLog(it) }
+                    }
 
                     try {
                         //I've set this to max 3 min. If we make an UI for Hook Settings, we'll let the user to change this.
@@ -108,7 +108,7 @@ class Hooker : IXposedHookLoadPackage {
     }
 
     companion object {
-        const val TARGET_PKG_VERSION_NAME = "8.22.0"
+        const val TARGET_PKG_VERSION_NAME = "8.23.0"
 
         var pkgParam: LoadPackageParam by InitOnce()
         var appContext: Context by InitOnce()
