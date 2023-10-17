@@ -15,7 +15,12 @@ class Hooker : IXposedHookLoadPackage {
     fun toastInvalidVersionName() {
         Toast.makeText(
             appContext,
-            "This hook is for client version $TARGET_PKG_VERSION_NAME. (Current: $pkgVersionName) Hook will not be loaded.",
+            "This hook is for client version $TARGET_PKG_VERSION_NAME (Current: $pkgVersionName).",
+            Toast.LENGTH_LONG
+        ).show()
+        Toast.makeText(
+            appContext,
+            "Hook may not be loaded successfully.",
             Toast.LENGTH_LONG
         ).show()
     }
@@ -50,7 +55,6 @@ class Hooker : IXposedHookLoadPackage {
 
                     if (pkgVersionName != TARGET_PKG_VERSION_NAME) {
                         toastInvalidVersionName()
-                        return
                     }
 
                     try {
