@@ -1183,7 +1183,7 @@ object Hooks {
                         val rootView = getObjectField(profile, "a") as? ViewGroup ?: return
                         val statsView = rootView.getChildAt(3) as? ViewGroup ?: return
 
-                        findHeightAndWeightTextViews(statsView)?.let { (height, weight) ->
+                        findHeightAndWeightTextViews(statsView).let { (height, weight) ->
                             if (height != null && weight != null) {
                                 val bmi = Utils.getBMIDescription(height.text.toString(), weight.text.toString())
                                 weight.text = "${weight.text} - BMI $bmi"
