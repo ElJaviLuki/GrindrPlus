@@ -17,9 +17,9 @@ ext {
         appcompat: '1.6.1'
     ]
     versionMajor = 3
-    versionMinor = 0
+    versionMinor = 1
     versionPatch = 0
-    grindrVersion = '24.3.1'
+    grindrVersion = '24.4.0'
 }
 
 android {

@@ -12,7 +12,7 @@ class EnableUnlimited: Hook("Enable unlimited",
         val userSessionClass = findClass(userSession)
 
         userSessionClass?.hook( // hasFeature()
-            "x", HookStage.AFTER) { param ->
+            "k", HookStage.AFTER) { param ->
                 val disallowedFeatures = setOf("DisableScreenshot")
                 param.setResult(param.arg(0) !in disallowedFeatures)
             }
@@ -28,12 +28,12 @@ class EnableUnlimited: Hook("Enable unlimited",
         }
 
         userSessionClass?.hook( // isFree()
-            "t", HookStage.BEFORE) { param ->
+            "u", HookStage.BEFORE) { param ->
                 param.setResult(false)
             }
 
         userSessionClass?.hook( // isXtra()
-            "r", HookStage.AFTER) { param ->
+            "s", HookStage.AFTER) { param ->
                 param.setResult(false)
             }
 

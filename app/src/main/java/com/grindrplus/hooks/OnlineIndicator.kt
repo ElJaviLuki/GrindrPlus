@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.minutes
 
 class OnlineIndicator: Hook("Online indicator",
     "Customize online indicator duration") {
-    val utils = "ne.t0"
+    val utils = "c9.u"
 
     override fun init() {
         findClass(utils) // shouldShowOnlineIndicator()

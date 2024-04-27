@@ -7,7 +7,7 @@ import com.grindrplus.utils.hook
 class RemovableMessages: Hook("Removable messages",
     "Allow to remove any message, no matter how old it is") {
     private val chatMessageContent = "com.grindrapp.android.persistence.model.ChatMessageContent"
-    private val showMessageLongClickDialog = "fc.y2"
+    private val showMessageLongClickDialog = "jc.y2"
 
     override fun init() {
         findClass(chatMessageContent)

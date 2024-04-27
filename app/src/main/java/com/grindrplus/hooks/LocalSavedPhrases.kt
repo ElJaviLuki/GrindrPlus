@@ -10,8 +10,8 @@ import java.lang.reflect.Constructor
 
 class LocalSavedPhrases: Hook("Local saved phrases",
     "Save unlimited phrases locally") {
-    private val phrasesRestService = "u4.k"
-    private val createSuccessResult = "h9.a\$b"
+    private val phrasesRestService = "v5.k"
+    private val createSuccessResult = "ka.a\$b"
     private val retrofit = "retrofit2.Retrofit"
     private val chatRestService = "com.grindrapp.android.chat.api.ChatRestService"
     private val addSavedPhraseResponse = "com.grindrapp.android.chat.api.model.AddSavedPhraseResponse"

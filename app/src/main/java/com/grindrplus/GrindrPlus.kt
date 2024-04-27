@@ -85,10 +85,10 @@ class GrindrPlus(
                     showToast(Log.ERROR, "Failed to initialize: ${it.message}")
                 }
             }
-        }
 
-        hookMainActivity("onCreate") { param ->
-            appContext.mainActivity = this
+            hookMainActivity("onCreate") { param ->
+                appContext.mainActivity = this
+            }
         }
     }
 

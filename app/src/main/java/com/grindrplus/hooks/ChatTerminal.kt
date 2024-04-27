@@ -10,7 +10,7 @@ import org.json.JSONObject
 
 class ChatTerminal: Hook("Chat terminal",
     "Create a chat terminal to execute commands") {
-    private val chatMessageHandler = "b6.b"
+    private val chatMessageHandler = "c7.b"
 
     override fun init() {
         findClass(chatMessageHandler)

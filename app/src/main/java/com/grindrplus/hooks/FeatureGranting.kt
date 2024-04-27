@@ -10,8 +10,8 @@ import de.robv.android.xposed.XposedHelpers.getObjectField
 
 class FeatureGranting: Hook("Feature granting",
     "Grant all Grindr features") {
-    private val featureFlags = "i7.g"
-    private val featureModel = "c9.o"
+    private val featureFlags = "j8.h"
+    private val featureModel = "fa.o"
     private val upsellsV8Model = "com.grindrapp.android.model.UpsellsV8"
     private val insertsModel = "com.grindrapp.android.model.Inserts"
     private val settingDistanceVisibilityViewModel =

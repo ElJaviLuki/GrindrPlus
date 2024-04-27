@@ -8,7 +8,7 @@ import com.grindrplus.utils.Hook
 class DisableAnalytics: Hook("Disable analytics",
     "Disable Grindr analytics (data collection)") {
     private val retrofit = "retrofit2.Retrofit"
-    private val analyticsRestService = "u4.b"
+    private val analyticsRestService = "v5.b"
 
     override fun init() {
         val analyticsRestServiceClass = findClass(analyticsRestService)
