@@ -24,7 +24,12 @@ class FeatureGranting: Hook("Feature granting",
         val featureFlagsClass = findClass(featureFlags)
 
         findClass(featureModel)
-            ?.hook("isGranted", HookStage.AFTER) { param ->
+            ?.hook("e", HookStage.AFTER) { param ->
+                param.setResult(true)
+            }
+
+        findClass(featureModel)
+            ?.hook("f", HookStage.AFTER) { param ->
                 param.setResult(true)
             }
 
