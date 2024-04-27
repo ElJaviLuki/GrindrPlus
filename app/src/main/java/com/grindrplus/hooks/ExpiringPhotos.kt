@@ -9,6 +9,7 @@ class ExpiringPhotos: Hook("Expiring photos",
     "Allow unlimited photo viewing") {
     private val expiringImageBody = "com.grindrapp.android.model.ExpiringImageBody"
     private val expiringImageBodyUiData = "com.grindrapp.android.ui.chat.model.BodyUiData\$ExpiringImageBodyUiData"
+    private val expiringStatusResponse = "com.grindrapp.android.chat.api.model.ExpiringPhotoStatusResponse"
 
     override fun init() {
         findClass(expiringImageBodyUiData)
@@ -23,6 +24,16 @@ class ExpiringPhotos: Hook("Expiring photos",
 
         findClass(expiringImageBody)
             ?.hook("getViewsRemaining", HookStage.AFTER) { param ->
+                param.setResult(Int.MAX_VALUE)
+            }
+
+        findClass(expiringStatusResponse)
+            ?.hook("getAvailable", HookStage.AFTER) { param ->
+                param.setResult(Int.MAX_VALUE)
+            }
+
+        findClass(expiringStatusResponse)
+            ?.hook("getTotal", HookStage.AFTER) { param ->
                 param.setResult(Int.MAX_VALUE)
             }
 
