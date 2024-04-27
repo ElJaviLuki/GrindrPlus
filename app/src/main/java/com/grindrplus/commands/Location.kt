@@ -71,31 +71,33 @@ class Location(context: ModContext, recipient: String, sender: String) : Command
 
     @Command(name = "save", aliases = ["sv"], help = "Save the current location")
     fun save(args: List<String>) {
-        val location = (Config.get("current_location", "") as String)
-        if (location.isEmpty()) {
-            return context.showToast(Toast.LENGTH_LONG,
-                "No location to save")
+        if (args.isEmpty()) {
+            context.showToast(Toast.LENGTH_LONG,"Please provide a name for the location")
+            return
         }
 
-        val name = args.joinToString(" ")
-        if (context.database.getLocation(name) != null) {
-            context.database.updateLocation(
-                name, // Location name
-                location.split(",")[0].toDouble(),
-                location.split(",")[1].toDouble()
-            )
-            return context.showToast(Toast.LENGTH_LONG,
-                "Successfully updated $name")
+        val name = args[0]
+
+        val location = when {
+            args.size == 1 -> Config.get("current_location", "") as String
+            args.size == 2 && args[1].contains(",") -> args[1]
+            args.size == 3 && args[1].toDoubleOrNull() != null && args[2].toDoubleOrNull() != null -> "${args[1]},${args[2]}"
+            args.size > 1 -> getLocationFromNominatim(args.drop(1).joinToString(" "))?.let { "${it.first},${it.second}" }
+            else -> ""
         }
 
-        context.database.addLocation(
-            name, // Location name
-            location.split(",")[0].toDouble(),
-            location.split(",")[1].toDouble()
-        )
+        if (location != null) {
+            val (lat, lon) = location.split(",").map { it.toDouble() }
+            val existingLocation = context.database.getLocation(name)
 
-        return context.showToast(Toast.LENGTH_LONG,
-            "Location saved as $name")
+            if (existingLocation != null) {
+                context.database.updateLocation(name, lat, lon)
+                context.showToast(Toast.LENGTH_LONG, "Successfully updated $name")
+            } else {
+                context.database.addLocation(name, lat, lon)
+                context.showToast(Toast.LENGTH_LONG, "Successfully saved $name")
+            }
+        }
     }
 
     @Command(name = "delete", aliases = ["del"], help = "Delete a saved location")
