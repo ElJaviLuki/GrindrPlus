@@ -4,8 +4,8 @@ import com.grindrplus.GrindrPlus
 import com.grindrplus.core.Utils.createServiceProxy
 import com.grindrplus.utils.Hook
 import com.grindrplus.utils.HookStage
+import com.grindrplus.utils.RetrofitUtils.findPOSTMethod
 import com.grindrplus.utils.hook
-import de.robv.android.xposed.XposedHelpers.callMethod
 
 class ProfileViews: Hook(
     "Profile views",
@@ -20,16 +20,9 @@ class ProfileViews: Hook(
     override fun init() {
         val profileRestServiceClass = findClass(profileRestService) ?: return
 
-        val methodBlacklist = profileRestServiceClass.declaredMethods
-            .asSequence()
-            .filter {
-                it.annotations.any {
-                    it.annotationClass.java.name == "retrofit2.http.POST"
-                            && callMethod(it, "value") in blacklistedPaths
-                }
-            }
-            .map { it.name }
-            .toList()
+        val methodBlacklist = blacklistedPaths.mapNotNull {
+            findPOSTMethod(profileRestServiceClass, it)?.name
+        }
 
         if (methodBlacklist.size != blacklistedPaths.size) {
             GrindrPlus.logger.log("ProfileViews: not all blacklisted paths were found! Open an issue on GitHub.")

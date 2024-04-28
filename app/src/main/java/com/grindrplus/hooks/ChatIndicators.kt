@@ -4,8 +4,8 @@ import com.grindrplus.GrindrPlus
 import com.grindrplus.core.Utils.createServiceProxy
 import com.grindrplus.utils.Hook
 import com.grindrplus.utils.HookStage
+import com.grindrplus.utils.RetrofitUtils
 import com.grindrplus.utils.hook
-import de.robv.android.xposed.XposedHelpers.callMethod
 
 class ChatIndicators: Hook(
     "Chat indicators",
@@ -19,16 +19,9 @@ class ChatIndicators: Hook(
     override fun init() {
         val chatRestServiceClass = findClass(chatRestService) ?: return
 
-        val methodBlacklist = chatRestServiceClass.declaredMethods
-            .asSequence()
-            .filter {
-                it.annotations.any {
-                    it.annotationClass.java.name == "retrofit2.http.POST"
-                            && callMethod(it, "value") in blacklistedPaths
-                }
-            }
-            .map { it.name }
-            .toList()
+        val methodBlacklist = blacklistedPaths.mapNotNull {
+            RetrofitUtils.findPOSTMethod(chatRestServiceClass, it)?.name
+        }
 
         if (methodBlacklist.size != blacklistedPaths.size) {
             GrindrPlus.logger.log("ChatIndicators: not all blacklisted paths were found! Open an issue on GitHub.")

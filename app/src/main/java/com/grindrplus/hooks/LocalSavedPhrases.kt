@@ -3,6 +3,9 @@ package com.grindrplus.hooks
 import com.grindrplus.GrindrPlus
 import com.grindrplus.utils.Hook
 import com.grindrplus.utils.HookStage
+import com.grindrplus.utils.RetrofitUtils.isDELETE
+import com.grindrplus.utils.RetrofitUtils.isGET
+import com.grindrplus.utils.RetrofitUtils.isPOST
 import com.grindrplus.utils.hook
 import de.robv.android.xposed.XposedHelpers.getObjectField
 import java.lang.reflect.Constructor
@@ -50,8 +53,8 @@ class LocalSavedPhrases: Hook(
             originalService.javaClass.classLoader,
             arrayOf(findClass(chatRestService))
         ) { proxy, method, args ->
-            when (method.name) {
-                "w" -> { // Annotated with @POST("v3/me/prefs/phrases")
+            when {
+                method.isPOST("v3/me/prefs/phrases") -> {
                     val phrase = getObjectField(args[0], "phrase") as String
                     val currentPhrases = GrindrPlus.database.getPhraseList()
                     var index = GrindrPlus.database.getCurrentPhraseIndex() + 1
@@ -61,12 +64,12 @@ class LocalSavedPhrases: Hook(
                         ?.newInstance(index.toString())
                     createSuccess.newInstance(response)
                 }
-                "o" -> { // Annotated with @DELETE("v3/me/prefs/phrases/{id}")
+                method.isDELETE("v3/me/prefs/phrases/{id}") -> {
                     val index = GrindrPlus.database.getCurrentPhraseIndex()
                     GrindrPlus.database.deletePhrase(index)
                     createSuccess.newInstance(Unit)
                 }
-                "C" -> { // Annotated with @POST("v4/phrases/frequency/{id}")
+                method.isPOST("v4/phrases/frequency/{id}") -> {
                     val index = GrindrPlus.database.getCurrentPhraseIndex()
                     val phrase = GrindrPlus.database.getPhrase(index)
                     GrindrPlus.database.updatePhrase(index,
@@ -90,8 +93,8 @@ class LocalSavedPhrases: Hook(
             originalService.javaClass.classLoader,
             arrayOf(findClass(phrasesRestService))
         ) { proxy, method, args ->
-            when (method.name) {
-                "a" -> { // Annotated with @GET("v3/me/prefs")
+            when {
+                method.isGET("v3/me/prefs") -> {
                     val currentPhrases = GrindrPlus.database.getPhraseList()
                     val phrases = currentPhrases.associateWith { phrase ->
                         val text = phrase.getAsString("text")
