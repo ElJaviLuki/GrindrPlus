@@ -10,8 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-class UnlimitedAlbums: Hook("Unlimited albums",
-    "Allow to be able to view unlimited albums") {
+class UnlimitedAlbums: Hook(
+    "Unlimited albums",
+    "Allow to be able to view unlimited albums"
+) {
     private val albumModel = "com.grindrapp.android.model.Album"
     private val albumContent = "com.grindrapp.android.model.AlbumContent"
 
@@ -19,19 +21,18 @@ class UnlimitedAlbums: Hook("Unlimited albums",
     private val albumCache = mutableMapOf<Any, MutableMap<String, Any>>()
 
     override fun init() {
-        val albumModelClass = findClass(albumModel)
+        val albumModelClass = findClass(albumModel) ?: return
 
         findClass(albumContent)
-            ?.hook("getRemainingViews", HookStage.AFTER) { param ->
+            ?.hook("getRemainingViews", HookStage.BEFORE) { param ->
                 param.setResult(Int.MAX_VALUE)
             }
 
-        albumModelClass?.hook(
-            "getAlbumViewable", HookStage.AFTER) { param ->
-                param.setResult(true)
-            }
+        albumModelClass.hook("getAlbumViewable", HookStage.BEFORE) { param ->
+            param.setResult(true)
+        }
 
-        albumModelClass?.hook("getContent", HookStage.AFTER) { param ->
+        albumModelClass.hook("getContent", HookStage.AFTER) { param ->
             /**
              * If we've already processed this object, return the cached value
              */
@@ -84,7 +85,7 @@ class UnlimitedAlbums: Hook("Unlimited albums",
                     for (element in savedContentsList) {
                         val savedContent = GrindrPlus.database.getAlbumContent(element)
                         if (savedContent != null) {
-                            loadClass(albumContent)?.constructors?.first()?.newInstance(
+                            findClass(albumContent)?.constructors?.first()?.newInstance(
                                 savedContent.getAsLong("contentId"),
                                 savedContent.getAsString("contentType"),
                                 savedContent.getAsString("url"),

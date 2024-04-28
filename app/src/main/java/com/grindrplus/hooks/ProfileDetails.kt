@@ -15,8 +15,10 @@ import de.robv.android.xposed.XposedHelpers.getObjectField
 import de.robv.android.xposed.XposedHelpers.setObjectField
 import kotlin.math.roundToInt
 
-class ProfileDetails: Hook("Profile details",
-    "Add extra fields and details to profiles") {
+class ProfileDetails: Hook(
+    "Profile details",
+    "Add extra fields and details to profiles"
+) {
     private var boostedProfilesList = emptyList<String>()
     val distanceUtils = "com.grindrapp.android.utils.DistanceUtils"
     val profileBarView = "com.grindrapp.android.ui.profileV2.ProfileBarView"

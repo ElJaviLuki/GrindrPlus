@@ -6,35 +6,37 @@ import com.grindrplus.utils.HookStage
 import com.grindrplus.utils.hook
 import de.robv.android.xposed.XposedHelpers.getObjectField
 
-class ExpiringPhotos: Hook("Expiring photos",
-    "Allow unlimited photo viewing") {
+class ExpiringPhotos: Hook(
+    "Expiring photos",
+    "Allow unlimited photo viewing"
+) {
     private val expiringImageBody = "com.grindrapp.android.model.ExpiringImageBody"
     private val expiringImageBodyUiData = "com.grindrapp.android.ui.chat.model.BodyUiData\$ExpiringImageBodyUiData"
     private val expiringStatusResponse = "com.grindrapp.android.chat.api.model.ExpiringPhotoStatusResponse"
 
     override fun init() {
         findClass(expiringImageBodyUiData)
-            ?.hook("hasViewsRemaining", HookStage.AFTER) { param ->
+            ?.hook("hasViewsRemaining", HookStage.BEFORE) { param ->
                 param.setResult(true)
             }
 
         findClass(expiringImageBody)
-            ?.hook("getDuration", HookStage.AFTER) { param ->
+            ?.hook("getDuration", HookStage.BEFORE) { param ->
                 param.setResult(Long.MAX_VALUE)
             }
 
         findClass(expiringImageBody)
-            ?.hook("getViewsRemaining", HookStage.AFTER) { param ->
+            ?.hook("getViewsRemaining", HookStage.BEFORE) { param ->
                 param.setResult(Int.MAX_VALUE)
             }
 
         findClass(expiringStatusResponse)
-            ?.hook("getAvailable", HookStage.AFTER) { param ->
+            ?.hook("getAvailable", HookStage.BEFORE) { param ->
                 param.setResult(Int.MAX_VALUE)
             }
 
         findClass(expiringStatusResponse)
-            ?.hook("getTotal", HookStage.AFTER) { param ->
+            ?.hook("getTotal", HookStage.BEFORE) { param ->
                 param.setResult(Int.MAX_VALUE)
             }
 

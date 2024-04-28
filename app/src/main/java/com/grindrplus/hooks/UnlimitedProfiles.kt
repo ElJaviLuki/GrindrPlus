@@ -3,12 +3,11 @@ package com.grindrplus.hooks
 import com.grindrplus.utils.Hook
 import com.grindrplus.utils.HookStage
 import com.grindrplus.utils.hook
-import de.robv.android.xposed.XposedHelpers.callMethod
-import de.robv.android.xposed.XposedHelpers.getObjectField
 
-class UnlimitedProfiles: Hook("Unlimited profiles",
-    "Allow unlimited profiles") {
-    private var boostedProfilesList = emptyList<String>()
+class UnlimitedProfiles: Hook(
+    "Unlimited profiles",
+    "Allow unlimited profiles"
+) {
     private val serverDrivenCascadeCachedState =
         "com.grindrapp.android.persistence.model.serverdrivencascade.ServerDrivenCascadeCacheState"
     private val serverDrivenCascadeCachedProfile =
@@ -18,27 +17,21 @@ class UnlimitedProfiles: Hook("Unlimited profiles",
 
     override fun init() {
         findClass(inAccessibleProfileManager)
-            ?.hook("a", HookStage.AFTER) { param ->
+            ?.hook("a", HookStage.BEFORE) { param ->
                 param.setResult(true)
             }
 
         findClass(serverDrivenCascadeCachedState)
             ?.hook("getItems", HookStage.AFTER) { param ->
                 val items = (param.getResult() as List<*>).filter {
-                    (it?.javaClass?.name ?: "") == serverDrivenCascadeCachedProfile
-                }
-
-                items.forEach {
-                    if (getObjectField(it, "isBoosting") as Boolean) {
-                        boostedProfilesList += callMethod(it, "getProfileId") as String
-                    }
+                    it?.javaClass?.name == serverDrivenCascadeCachedProfile
                 }
 
                 param.setResult(items)
             }
 
         findClass(serverDrivenCascadeCachedProfile)
-            ?.hook("getUpsellType", HookStage.AFTER) { param ->
+            ?.hook("getUpsellType", HookStage.BEFORE) { param ->
                 param.setResult(null)
             }
     }

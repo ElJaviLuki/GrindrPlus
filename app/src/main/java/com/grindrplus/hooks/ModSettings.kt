@@ -23,18 +23,18 @@ class ModSettings: Hook(
     private val hooksFragment = "com.grindrplus.ui.fragments.HooksFragment"
 
     override fun init() {
-        val nestedScrollViewClass = findClass("androidx.core.widget.NestedScrollView")
-        val getChildAtNestedScrollView = nestedScrollViewClass?.getMethod("getChildAt",
+        val nestedScrollViewClass = findClass("androidx.core.widget.NestedScrollView") ?: return
+        val getChildAtNestedScrollView = nestedScrollViewClass.getMethod("getChildAt",
             Int::class.java)
 
-        val fragmentClass = findClass("androidx.fragment.app.Fragment")
-        val fragmentActivityClass = findClass("androidx.fragment.app.FragmentActivity")
-        val getSupportFragmentManager = fragmentActivityClass?.getMethod("getSupportFragmentManager")
-        val fragmentManagerClass = findClass("androidx.fragment.app.FragmentManager")
-        val beginTransaction = fragmentManagerClass?.getMethod("beginTransaction")
-        val fragmentTransactionClass = findClass("androidx.fragment.app.FragmentTransaction")
-        val addFragmentTransaction = fragmentTransactionClass?.getMethod("add", Int::class.java, fragmentClass)
-        val commitFragmentTransaction = fragmentTransactionClass?.getMethod("commit")
+        val fragmentClass = findClass("androidx.fragment.app.Fragment") ?: return
+        val fragmentActivityClass = findClass("androidx.fragment.app.FragmentActivity") ?: return
+        val getSupportFragmentManager = fragmentActivityClass.getMethod("getSupportFragmentManager")
+        val fragmentManagerClass = findClass("androidx.fragment.app.FragmentManager") ?: return
+        val beginTransaction = fragmentManagerClass.getMethod("beginTransaction")
+        val fragmentTransactionClass = findClass("androidx.fragment.app.FragmentTransaction") ?: return
+        val addFragmentTransaction = fragmentTransactionClass.getMethod("add", Int::class.java, fragmentClass)
+        val commitFragmentTransaction = fragmentTransactionClass.getMethod("commit")
 
         findClass(settingsActivity)
             ?.hook("onCreate", HookStage.AFTER) { param ->
@@ -47,15 +47,14 @@ class ModSettings: Hook(
                     .java.getMethod("getRoot").invoke(settingsViewBinding) as RelativeLayout
                 val settingsNestedScrollView = settingsViewBindingRoot.getChildAt(1)
 
-                if (nestedScrollViewClass?.isInstance(settingsNestedScrollView) == true) {
+                if (nestedScrollViewClass.isInstance(settingsNestedScrollView)) {
                     val settingsScrollingContentLayout = getChildAtNestedScrollView
-                        ?.invoke(settingsNestedScrollView, 0) as LinearLayout
+                        .invoke(settingsNestedScrollView, 0) as LinearLayout
                     val settingsExampleContainer = settingsScrollingContentLayout
                         .getChildAt(2) as LinearLayout
                     val settingsExampleHeader = settingsExampleContainer.getChildAt(0) as TextView
                     val settingsExampleSubContainer = settingsExampleContainer.getChildAt(1) as LinearLayout
                     val settingsExampleSubContainerTextView = settingsExampleSubContainer.getChildAt(0) as TextView
-                    val settingsExampleDivider = settingsExampleContainer.getChildAt(2) as View
 
                     val modContainer = LinearLayout(activity).apply {
                         layoutParams = settingsExampleContainer.layoutParams
@@ -97,17 +96,12 @@ class ModSettings: Hook(
                         visibility = View.VISIBLE
                     }
 
-                    val modDivider = View(activity).apply {
-                        layoutParams = settingsExampleDivider.layoutParams
-                        background = settingsExampleDivider.background
-                    }
-
                     modSubContainerTextView.setOnClickListener {
-                        val hooksFragmentInstance = loadClass(hooksFragment)?.newInstance()
-                        val supportFragmentManager = getSupportFragmentManager?.invoke(activity)
-                        val fragmentTransaction = beginTransaction?.invoke(supportFragmentManager)
-                        addFragmentTransaction?.invoke(fragmentTransaction, android.R.id.content, hooksFragmentInstance)
-                        commitFragmentTransaction?.invoke(fragmentTransaction)
+                        val hooksFragmentInstance = findClass(hooksFragment)?.newInstance()
+                        val supportFragmentManager = getSupportFragmentManager.invoke(activity)
+                        val fragmentTransaction = beginTransaction.invoke(supportFragmentManager)
+                        addFragmentTransaction.invoke(fragmentTransaction, android.R.id.content, hooksFragmentInstance)
+                        commitFragmentTransaction.invoke(fragmentTransaction)
                     }
 
                     modSubContainer.addView(modSubContainerTextView, 0)

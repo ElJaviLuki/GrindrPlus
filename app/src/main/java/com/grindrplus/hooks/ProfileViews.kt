@@ -1,30 +1,46 @@
 package com.grindrplus.hooks
 
+import com.grindrplus.GrindrPlus
 import com.grindrplus.core.Utils.createServiceProxy
 import com.grindrplus.utils.Hook
 import com.grindrplus.utils.HookStage
 import com.grindrplus.utils.hook
+import de.robv.android.xposed.XposedHelpers.callMethod
 
-class ProfileViews: Hook("Profile views",
-    "Don't let others know you viewed their profile") {
-    private val retrofit = "retrofit2.Retrofit"
-    private val createSuccessResult = "h9.a\$b"
+class ProfileViews: Hook(
+    "Profile views",
+    "Don't let others know you viewed their profile"
+) {
     private val profileRestService = "com.grindrapp.android.api.ProfileRestService"
-    private val methodBlacklist = arrayOf(
-        "n", // Annotated with @POST("v4/views/{profileId}")
-        "h"  // Annotated with @POST("v4/views")
+    private val blacklistedPaths = setOf(
+        "v4/views/{profileId}",
+        "v4/views"
     )
 
     override fun init() {
-        val profileRestServiceClass = findClass(profileRestService)
-        val createSuccessResultCtor = findClass(createSuccessResult)?.constructors?.firstOrNull()
+        val profileRestServiceClass = findClass(profileRestService) ?: return
 
-        findClass(retrofit)?.hook("create", HookStage.AFTER) { param ->
+        val methodBlacklist = profileRestServiceClass.declaredMethods
+            .asSequence()
+            .filter {
+                it.annotations.any {
+                    it.annotationClass.java.name == "retrofit2.http.POST"
+                            && callMethod(it, "value") in blacklistedPaths
+                }
+            }
+            .map { it.name }
+            .toList()
+
+        if (methodBlacklist.size != blacklistedPaths.size) {
+            GrindrPlus.logger.log("ProfileViews: not all blacklisted paths were found! Open an issue on GitHub.")
+        }
+
+        findClass("retrofit2.Retrofit")
+            ?.hook("create", HookStage.AFTER) { param ->
             val service = param.getResult()
-            if (service?.javaClass?.let { profileRestServiceClass?.isAssignableFrom(it) } == true) {
-                param.setResult(profileRestServiceClass?.let {
-                    createServiceProxy(service, it, methodBlacklist)
-                })
+            if (service != null && profileRestServiceClass.isAssignableFrom(service.javaClass)) {
+                val proxy = createServiceProxy(service, profileRestServiceClass, methodBlacklist.toTypedArray())
+                param.setResult(proxy)
             }
         }
     }

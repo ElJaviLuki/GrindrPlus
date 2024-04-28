@@ -4,26 +4,28 @@ import com.grindrplus.utils.Hook
 import com.grindrplus.utils.HookStage
 import com.grindrplus.utils.hook
 
-class EnableUnlimited: Hook("Enable unlimited",
-    "Enable Grindr Unlimited features") {
+class EnableUnlimited: Hook(
+    "Enable unlimited",
+    "Enable Grindr Unlimited features"
+) {
     private val userSession = "com.grindrapp.android.storage.b"
 
     override fun init() {
         val userSessionClass = findClass(userSession)
 
         userSessionClass?.hook( // hasFeature()
-            "k", HookStage.AFTER) { param ->
+            "k", HookStage.BEFORE) { param ->
                 val disallowedFeatures = setOf("DisableScreenshot")
                 param.setResult(param.arg(0) !in disallowedFeatures)
             }
 
         userSessionClass?.hook( // isNoXtraUpsell()
-            "i", HookStage.AFTER) { param ->
+            "i", HookStage.BEFORE) { param ->
                 param.setResult(true)
             }
 
         userSessionClass?.hook( // isNoPlusUpsell()
-            "D", HookStage.AFTER) { param ->
+            "D", HookStage.BEFORE) { param ->
             param.setResult(true)
         }
 
@@ -33,12 +35,12 @@ class EnableUnlimited: Hook("Enable unlimited",
             }
 
         userSessionClass?.hook( // isXtra()
-            "s", HookStage.AFTER) { param ->
+            "s", HookStage.BEFORE) { param ->
                 param.setResult(false)
             }
 
         userSessionClass?.hook( // isPlus()
-            "B", HookStage.AFTER) { param ->
+            "B", HookStage.BEFORE) { param ->
                 param.setResult(false)
             }
 

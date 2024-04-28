@@ -1,27 +1,45 @@
 package com.grindrplus.hooks
 
+import com.grindrplus.GrindrPlus
 import com.grindrplus.core.Utils.createServiceProxy
 import com.grindrplus.utils.Hook
 import com.grindrplus.utils.HookStage
 import com.grindrplus.utils.hook
+import de.robv.android.xposed.XposedHelpers.callMethod
 
-class ChatIndicators: Hook("Chat indicators",
-    "Don't show chat markers / indicators to others") {
-    private val retrofit = "retrofit2.Retrofit"
+class ChatIndicators: Hook(
+    "Chat indicators",
+    "Don't show chat markers / indicators to others"
+) {
     private val chatRestService = "com.grindrapp.android.chat.api.ChatRestService"
-    private val methodBlacklist = arrayOf(
-        "p" // Annotated with @POST("v4/chatstatus/typing")
+    private val blacklistedPaths = setOf(
+        "v4/chatstatus/typing"
     )
 
     override fun init() {
-        val chatRestServiceClass = findClass(chatRestService)
+        val chatRestServiceClass = findClass(chatRestService) ?: return
 
-        findClass(retrofit)?.hook("create", HookStage.AFTER) { param ->
+        val methodBlacklist = chatRestServiceClass.declaredMethods
+            .asSequence()
+            .filter {
+                it.annotations.any {
+                    it.annotationClass.java.name == "retrofit2.http.POST"
+                            && callMethod(it, "value") in blacklistedPaths
+                }
+            }
+            .map { it.name }
+            .toList()
+
+        if (methodBlacklist.size != blacklistedPaths.size) {
+            GrindrPlus.logger.log("ChatIndicators: not all blacklisted paths were found! Open an issue on GitHub.")
+        }
+
+        findClass("retrofit2.Retrofit")
+            ?.hook("create", HookStage.AFTER) { param ->
             val service = param.getResult()
-            if (service?.javaClass?.let { chatRestServiceClass?.isAssignableFrom(it) } == true) {
-                param.setResult(chatRestServiceClass?.let {
-                    createServiceProxy(service, it, methodBlacklist)
-                })
+            if (service != null && service.javaClass.let { chatRestServiceClass.isAssignableFrom(it) }) {
+                val proxy = createServiceProxy(service, chatRestServiceClass, methodBlacklist.toTypedArray())
+                param.setResult(proxy)
             }
         }
     }

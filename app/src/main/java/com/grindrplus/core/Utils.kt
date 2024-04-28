@@ -8,21 +8,26 @@ import java.lang.reflect.Proxy
 import kotlin.math.pow
 
 object Utils {
-    fun createServiceProxy(originalService: Any, serviceClass: Class<*>,
-                           blacklist: Array<String> = emptyArray()): Any {
+    fun createServiceProxy(
+        originalService: Any,
+        serviceClass: Class<*>,
+        blacklist: Array<String> = emptyArray()
+    ): Any {
         val invocationHandler = Proxy.getInvocationHandler(originalService)
         val createSuccess = GrindrPlus.loadClass("h9.a\$b")?.constructors?.firstOrNull()
-        return Proxy.newProxyInstance(originalService.javaClass.classLoader,
-            arrayOf(serviceClass)) { proxy, method, args ->
-                if (blacklist.isEmpty()) {
+        return Proxy.newProxyInstance(
+            originalService.javaClass.classLoader,
+            arrayOf(serviceClass)
+        ) { proxy, method, args ->
+            if (blacklist.isEmpty()) {
+                createSuccess?.newInstance(Unit) ?: invocationHandler.invoke(proxy, method, args)
+            } else {
+                if (method.name in blacklist) {
                     createSuccess?.newInstance(Unit) ?: invocationHandler.invoke(proxy, method, args)
                 } else {
-                    if (method.name in blacklist) {
-                        createSuccess?.newInstance(Unit) ?: invocationHandler.invoke(proxy, method, args)
-                    } else {
-                        invocationHandler.invoke(proxy, method, args)
-                    }
+                    invocationHandler.invoke(proxy, method, args)
                 }
+            }
         }
     }
 

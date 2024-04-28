@@ -22,21 +22,7 @@ abstract class Hook(
     }
 
     protected fun findClass(name: String): Class<*>? {
-        return try {
-            GrindrPlus.loadClass(name)
-        } catch (e: ClassNotFoundException) {
-            GrindrPlus.logger.log("Failed to find class: $name")
-            null
-        }
-    }
-
-    protected fun loadClass(name: String): Class<*>? {
-        return try {
-            GrindrPlus.classLoader.loadClass(name)
-        } catch (e: ClassNotFoundException) {
-            GrindrPlus.logger.log("Failed to load class: $name")
-            null
-        }
+        return GrindrPlus.loadClass(name)
     }
 
     protected fun getResource(name: String, type: String): Int {

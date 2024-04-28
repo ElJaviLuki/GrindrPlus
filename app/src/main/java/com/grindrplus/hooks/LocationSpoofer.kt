@@ -34,35 +34,36 @@ import com.grindrplus.utils.HookStage
 import com.grindrplus.utils.hook
 import com.grindrplus.utils.hookConstructor
 
-class LocationSpoofer: Hook("Location spoofer",
-    "Spoof your location") {
+class LocationSpoofer: Hook(
+    "Location spoofer",
+    "Spoof your location"
+) {
     private val location = "android.location.Location"
     private val chatBottomToolbar = "com.grindrapp.android.view.ChatBottomToolbar"
     private val chatActivity = "com.grindrapp.android.ui.chat.ChatActivityV2"
 
     override fun init() {
-        val locationClass = findClass(location)
-        val chatActivityClass = findClass(chatActivity)
+        val locationClass = findClass(location) ?: return
 
         if (Build.VERSION.SDK_INT >= 31) {
-            locationClass?.hook("isMock",
-                HookStage.AFTER) { param ->
-                    param.setResult(false)
-                }
+            locationClass.hook("isMock",
+                HookStage.BEFORE) { param ->
+                param.setResult(false)
+            }
         }
 
-        locationClass?.hook("getLatitude", HookStage.AFTER) { param ->
+        locationClass.hook("getLatitude", HookStage.AFTER) { param ->
             (Config.get("current_location", "") as String).takeIf {
                 it.isNotEmpty() }?.split(",")?.firstOrNull()
                 ?.toDoubleOrNull()?.let { param.setResult(it)
-            }
+                }
         }
 
-        locationClass?.hook("getLongitude", HookStage.AFTER) { param ->
+        locationClass.hook("getLongitude", HookStage.AFTER) { param ->
             (Config.get("current_location", "") as String).takeIf {
                 it.isNotEmpty() }?.split(",")?.lastOrNull()
                 ?.toDoubleOrNull()?.let { param.setResult(it)
-            }
+                }
         }
 
         findClass(chatBottomToolbar)?.hookConstructor(HookStage.AFTER) { param ->

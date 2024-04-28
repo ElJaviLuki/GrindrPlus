@@ -8,8 +8,10 @@ import com.grindrplus.utils.hook
 import de.robv.android.xposed.XposedHelpers.getObjectField
 import org.json.JSONObject
 
-class ChatTerminal: Hook("Chat terminal",
-    "Create a chat terminal to execute commands") {
+class ChatTerminal: Hook(
+    "Chat terminal",
+    "Create a chat terminal to execute commands"
+) {
     private val chatMessageHandler = "c7.b"
 
     override fun init() {

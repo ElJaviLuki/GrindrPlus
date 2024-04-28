@@ -8,8 +8,10 @@ import com.grindrplus.utils.hook
 import com.grindrplus.utils.hookConstructor
 import de.robv.android.xposed.XposedHelpers.getObjectField
 
-class FeatureGranting: Hook("Feature granting",
-    "Grant all Grindr features") {
+class FeatureGranting: Hook(
+    "Feature granting",
+    "Grant all Grindr features"
+) {
     private val featureFlags = "j8.h"
     private val featureModel = "fa.o"
     private val upsellsV8Model = "com.grindrapp.android.model.UpsellsV8"
@@ -24,17 +26,17 @@ class FeatureGranting: Hook("Feature granting",
         val featureFlagsClass = findClass(featureFlags)
 
         findClass(featureModel)
-            ?.hook("e", HookStage.AFTER) { param ->
+            ?.hook("e", HookStage.BEFORE) { param ->
                 param.setResult(true)
             }
 
         findClass(featureModel)
-            ?.hook("f", HookStage.AFTER) { param ->
+            ?.hook("f", HookStage.BEFORE) { param ->
                 param.setResult(true)
             }
 
         featureFlagsClass?.hook(
-            "isEnabled", HookStage.AFTER) { param ->
+            "isEnabled", HookStage.BEFORE) { param ->
                 val featureFlagName = getObjectField(param.thisObject(),
                     "featureFlagName") as String
                 if (featureManager.isManaged(featureFlagName)) {
@@ -43,7 +45,7 @@ class FeatureGranting: Hook("Feature granting",
             }
 
         featureFlagsClass?.hook(
-            "isDisabled", HookStage.AFTER) { param ->
+            "isDisabled", HookStage.BEFORE) { param ->
                 val featureFlagName = getObjectField(param.thisObject(),
                     "featureFlagName") as String
                 if (featureManager.isManaged(featureFlagName)) {
@@ -58,12 +60,12 @@ class FeatureGranting: Hook("Feature granting",
 
         listOf(upsellsV8Model, insertsModel).forEach { model ->
             findClass(model)
-                ?.hook("getMpuFree", HookStage.AFTER) { param ->
+                ?.hook("getMpuFree", HookStage.BEFORE) { param ->
                     param.setResult(Int.MAX_VALUE)
                 }
 
             findClass(model)
-                ?.hook("getMpuXtra", HookStage.AFTER) { param ->
+                ?.hook("getMpuXtra", HookStage.BEFORE) { param ->
                     param.setResult(0)
                 }
         }

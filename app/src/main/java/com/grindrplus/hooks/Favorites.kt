@@ -18,8 +18,10 @@ import de.robv.android.xposed.XposedHelpers.callMethod
 import de.robv.android.xposed.XposedHelpers.getObjectField
 import kotlin.math.roundToInt
 
-class Favorites: Hook("Favorites",
-    "Customize layout for the favorites tab") {
+class Favorites: Hook(
+    "Favorites",
+    "Customize layout for the favorites tab"
+) {
     private val recyclerViewLayoutParams =
         "androidx.recyclerview.widget.RecyclerView\$LayoutParams"
     private val favoritesFragment = "com.grindrapp.android.favorites.FavoritesFragment"

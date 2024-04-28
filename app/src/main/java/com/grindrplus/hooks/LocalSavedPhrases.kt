@@ -8,8 +8,10 @@ import de.robv.android.xposed.XposedHelpers.getObjectField
 import java.lang.reflect.Constructor
 import java.lang.reflect.Proxy
 
-class LocalSavedPhrases: Hook("Local saved phrases",
-    "Save unlimited phrases locally") {
+class LocalSavedPhrases: Hook(
+    "Local saved phrases",
+    "Save unlimited phrases locally"
+) {
     private val phrasesRestService = "v5.k"
     private val createSuccessResult = "ka.a\$b"
     private val retrofit = "retrofit2.Retrofit"
@@ -18,26 +20,28 @@ class LocalSavedPhrases: Hook("Local saved phrases",
     private val phrasesResponse = "com.grindrapp.android.model.PhrasesResponse"
     private val phraseModel = "com.grindrapp.android.persistence.model.Phrase"
 
-override fun init() {
-    val chatRestServiceClass = findClass(chatRestService)
-    val createSuccess = findClass(createSuccessResult)?.constructors?.firstOrNull()
-    val phrasesRestServiceClass = findClass(phrasesRestService)
+    override fun init() {
+        val chatRestServiceClass = findClass(chatRestService) ?: return
+        val createSuccess = findClass(createSuccessResult)?.constructors?.firstOrNull() ?: return
+        val phrasesRestServiceClass = findClass(phrasesRestService) ?: return
 
-    findClass(retrofit)?.hook("create", HookStage.AFTER) { param ->
-        val service = param.getResult() ?: return@hook
-        param.setResult(
-            when {
-                chatRestServiceClass?.isAssignableFrom(service.javaClass) == true ->
-                    createChatRestServiceProxy(service, createSuccess!!)
-                phrasesRestServiceClass?.isAssignableFrom(service.javaClass) == true ->
-                    createPhrasesRestServiceProxy(service, createSuccess!!)
-                else -> service
+        findClass(retrofit)?.hook("create", HookStage.AFTER) { param ->
+            val service = param.getResult()
+            if (service != null) {
+                param.setResult(
+                    when {
+                        chatRestServiceClass.isAssignableFrom(service.javaClass) ->
+                            createChatRestServiceProxy(service, createSuccess)
+                        phrasesRestServiceClass.isAssignableFrom(service.javaClass) ->
+                            createPhrasesRestServiceProxy(service, createSuccess)
+                        else -> service
+                    }
+                )
             }
-        )
+        }
     }
-}
 
-    fun createChatRestServiceProxy(
+    private fun createChatRestServiceProxy(
         originalService: Any,
         createSuccess: Constructor<*>
     ): Any {
@@ -77,7 +81,7 @@ override fun init() {
         }
     }
 
-    fun createPhrasesRestServiceProxy(
+    private fun createPhrasesRestServiceProxy(
         originalService: Any,
         createSuccess: Constructor<*>
     ): Any {
