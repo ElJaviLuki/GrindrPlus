@@ -7,7 +7,10 @@ import com.grindrplus.core.Config
 import okhttp3.OkHttpClient
 import org.json.JSONArray
 
-class Location(recipient: String, sender: String) : CommandModule(recipient, sender) {
+class Location(
+    recipient: String,
+    sender: String
+) : CommandModule("Location", recipient, sender) {
     @Command(name = "tp", aliases = ["tp"], help = "Teleport to a location")
     fun teleport(args: List<String>) {
         /**

@@ -9,9 +9,12 @@ import com.grindrplus.GrindrPlus
 import com.grindrplus.core.Utils.openProfile
 import com.grindrplus.ui.Utils.copyToClipboard
 
-class Profile(recipient: String, sender: String) : CommandModule(recipient, sender) {
+class Profile(
+    recipient: String,
+    sender: String
+) : CommandModule("Profile", recipient, sender) {
     @Command("open", help = "Open a user's profile")
-    private fun open(args: List<String>) {
+    fun open(args: List<String>) {
         if (args.isNotEmpty()) {
             return openProfile(args[0])
         } else {
@@ -22,7 +25,7 @@ class Profile(recipient: String, sender: String) : CommandModule(recipient, send
 
     @SuppressLint("SetTextI18n")
     @Command("id", help = "Get and copy profile IDs")
-    private fun id(args: List<String>) {
+    fun id(args: List<String>) {
         GrindrPlus.runOnMainThreadWithCurrentActivity { activity ->
             val dialogView = LinearLayout(activity).apply {
                 orientation = LinearLayout.VERTICAL

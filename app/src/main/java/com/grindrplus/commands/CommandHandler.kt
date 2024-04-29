@@ -22,7 +22,7 @@ class CommandHandler(
             GrindrPlus.runOnMainThreadWithCurrentActivity { activity ->
                 AlertDialog.Builder(activity)
                     .setTitle("Help")
-                    .setMessage(commandModules.joinToString("\n") { it.getHelp() }.drop(1))
+                    .setMessage(commandModules.joinToString("\n\n") { it.getHelp() })
                     .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
                     .create()
                     .show()
