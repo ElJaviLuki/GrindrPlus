@@ -17,12 +17,12 @@ object Hooker {
     ): XC_MethodHook {
         return when (stage) {
             HookStage.BEFORE -> object : XC_MethodHook() {
-                override fun beforeHookedMethod(param: MethodHookParam<*>) {
+                override fun beforeHookedMethod(param: MethodHookParam) {
                     HookAdapter<T>(param).takeIf(filter)?.also(consumer)
                 }
             }
             HookStage.AFTER -> object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam<*>) {
+                override fun afterHookedMethod(param: MethodHookParam) {
                     HookAdapter<T>(param).takeIf(filter)?.also(consumer)
                 }
             }

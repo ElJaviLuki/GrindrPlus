@@ -9,7 +9,7 @@ import java.util.function.Consumer
 
 @Suppress("UNCHECKED_CAST")
 class HookAdapter<Clazz>(
-    private val methodHookParam: XC_MethodHook.MethodHookParam<*>
+    private val methodHookParam: XC_MethodHook.MethodHookParam
 ) {
     fun thisObject(): Clazz {
         return methodHookParam.thisObject as Clazz

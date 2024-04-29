@@ -4,20 +4,17 @@ kotlin = "1.9.23"
 coreKtx = "1.13.0"
 lifecycleRuntimeKtx = "2.7.0"
 okhttp = "4.12.0"
-moshi = "1.15.1"
 ksp = "1.9.23-1.0.20"
 datastore = "1.1.0"
 room = "2.6.1"
 appcompat = "1.6.1"
 coordinatorlayout = "1.2.0"
 material = "1.11.0"
+xposed = "82"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-square-moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
-square-moshi-adapters = { group = "com.squareup.moshi", name = "moshi-adapters", version.ref = "moshi" }
-square-moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
 square-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -26,6 +23,7 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-coordinatorlayout = { group = "androidx.coordinatorlayout", name = "coordinatorlayout", version.ref = "coordinatorlayout" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+xposed-api = { group = "de.robv.android.xposed", name = "api", version.ref = "xposed" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

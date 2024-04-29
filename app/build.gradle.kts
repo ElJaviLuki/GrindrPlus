@@ -67,16 +67,13 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.square.moshi)
-    implementation(libs.square.moshi.adapters)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.material)
-    ksp(libs.square.moshi.kotlin.codegen)
     implementation(libs.square.okhttp)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
-    compileOnly(fileTree("libs") { include("*.jar") })
+    compileOnly(libs.xposed.api)
 }
