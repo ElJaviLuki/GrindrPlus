@@ -84,4 +84,15 @@ object Utils {
             feet * 12 + inches
         }
     }
+
+    fun safeGetField(obj: Any, fieldName: String): Any? {
+        return try {
+            obj::class.java.getDeclaredField(fieldName).apply {
+                isAccessible = true
+            }.get(obj)
+        } catch (e: Exception) {
+            GrindrPlus.logger.log("Failed to get field $fieldName from object $obj")
+            null
+        }
+    }
 }
