@@ -21,6 +21,11 @@ Neither I ([@R0rt1z2](https://github.com/R0rt1z2)) nor any contributors listed h
 
 Use this mod at your own discretion, and be aware that future updates may introduce changes or require further adjustments.
 
+## Disclaimer
+This mod is provided for free with no warranty of any kind. Use at your own risk! We are not responsible for lost chats, user data, unexpected bans or any other problems incurred from the use of this module.
+
+This mod does not collect any personal data nor does it display ads of any kind. No earnings are generated or collected from the use of this software. This project is open source so you can check all these facts by your own!
+
 ## Features
 <details closed>
   <summary>Chat</summary>
@@ -179,6 +184,11 @@ Each installation method is completely different and comes with its own challeng
 
 </details>
 
+## Acknowledgments
+This project relies on several third-party libraries, and we extend our gratitude to their authors for their valuable contributions. For a complete list of these dependencies, please refer to the [dependencies](https://github.com/R0rt1z2/GrindrPlus/blob/master/app/build.gradle.kts#L67-L79) section of the `build.gradle.kts` file.
+
+I would also like to give special recognition to [@rhunk](https://github.com/rhunk) and the other developers of [SE](https://github.com/rhunk/SnapEnhance). Their work has been very useful for this mod, and some portions of their code have been used here.
+
 ## Contributing
 This project is open to any kind of contribution. Feel free to [open a pull request](https://github.com/R0rt1z2/GrindrPlus/pulls) or [submit an issue](https://github.com/R0rt1z2/GrindrPlus/issues)! [Discussions section](https://github.com/R0rt1z2/GrindrPlus/discussions) also available!
 
@@ -188,10 +198,7 @@ This project is open to any kind of contribution. Feel free to [open a pull requ
 - [JingMatrix's LSPosed fork](https://github.com/JingMatrix/LSPosed)
 - [JingMatrix's LSPatch fork](https://github.com/JingMatrix/LSPatch)
 
-## Disclaimer
-This mod is provided for free with no warranty of any kind. Use at your own risk! We are not responsible for lost chats, user data, unexpected bans or any other problems incurred from the use of this module.
+## License
+This project is distributed under the GPL-3.0 License. For more information, simply refer to the [LICENSE](https://github.com/R0rt1z2/GrindrPlus/blob/master/LICENSE) file. Please note that the [`old_base`](https://github.com/R0rt1z2/GrindrPlus/tree/old_base) branch is not subjected to any license, as the original author did not assign or attribute one.
 
-This mod does not collect any personal data nor does it display ads of any kind. No earnings are generated or collected from the use of this software. This project is open source so you can check all these facts by your own!
-
-## Credits
 As an open source project, you're free to inspire yourself from this code. However, please **DON'T copy it and release it as your own (kanging)**. Give the proper credit and reference to the [original project](https://github.com/R0rt1z2/GrindrPlus) and its [contributors](https://github.com/R0rt1z2/GrindrPlus/graphs/contributors).
