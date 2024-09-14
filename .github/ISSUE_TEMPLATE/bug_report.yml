@@ -1,0 +1,198 @@
+name: 🐞 Bug Report
+description:  Create a report about something that is not working
+title: "[BUG]: "
+labels: ["bug"]
+projects: ["R0rt1z2/GrindrPlus"]
+assignees:
+  - R0rt1z2
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to fill out this bug report. We greatly appreciate your effort in helping us improve the project :) Before submitting your report, please take a moment to ensure that all the information provided is as complete and accurate as possible.
+
+        Well-detailed bug reports allow us to identify, replicate, and fix issues faster. Please include the steps to reproduce the problem, your device and environment details, and any relevant logs or additional information. If possible, describe what you expected to happen versus what actually occurred.
+
+        > [!IMPORTANT]
+        > **Malformed or incomplete bug reports will NOT be accepted.**
+        > This includes reports with missing key information, vague descriptions, or those lacking logs and proper reproduction steps.
+
+  - type: markdown
+    attributes:
+      value: |
+        Please search to see if an issue already exists for the bug you encountered. You can search existing issues [here](https://github.com/R0rt1z2/GrindrPlus/issues).
+
+  - type: checkboxes
+    id: existing-issue
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please confirm that you have searched the existing issues.
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: Provide a clear and concise description of the bug.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Provide the steps to reproduce the issue. For example:
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+      placeholder: List the steps to reproduce the bug.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation Method
+      description: Please select how you installed the mod.
+      options:
+        - LSPatch
+        - LSPosed
+    validations:
+      required: true
+
+  - type: input
+    id: lspatch-version
+    attributes:
+      label: LSPatch version
+      description: |
+        If you installed the mod using LSPatch, enter the version of LSPatch (e.g. `0.6 (402)`).
+        *If you did not use LSPatch, leave this field blank.*
+      placeholder: Enter the LSPatch version
+    validations:
+      required: false
+
+  - type: input
+    id: lspatch-variant
+    attributes:
+      label: LSPatch variant
+      description: |
+        If you installed the mod using LSPatch, enter the variant used (e.g. `Official`, `JingMatrix's`, `LSPosed_mod`).
+        *If you did not use LSPatch, leave this field blank.*
+      placeholder: Enter the LSPatch variant
+    validations:
+      required: false
+
+  - type: input
+    id: lsposed-version
+    attributes:
+      label: LSPosed version
+      description: |
+        If you installed the mod using LSPosed, enter the version of LSPosed (e.g. `1.9.2 (7024)`).
+        *If you did not use LSPosed, leave this field blank.*
+      placeholder: Enter the LSPosed version
+    validations:
+      required: false
+
+  - type: input
+    id: lsposed-variant
+    attributes:
+      label: LSPosed variant
+      description: |
+        If you installed the mod using LSPosed, enter the variant used (e.g. `Official`, `JingMatrix's`, `LSPosed_mod`).
+        *If you did not use LSPosed, leave this field blank.*
+      placeholder: Enter the LSPosed variant
+    validations:
+      required: false
+
+  - type: input
+    id: rom
+    attributes:
+      label: ROM
+      description: ROM (e.g. `OneUI`, `LineageOS`)
+      placeholder: Enter the ROM version
+    validations:
+      required: true
+
+  - type: input
+    id: android-version
+    attributes:
+      label: Android Version
+      description: Android Version (e.g. `13`, `12`, `8.1`, `14`)
+      placeholder: Enter the Android version
+    validations:
+      required: false
+
+  - type: input
+    id: google-play-update
+    attributes:
+      label: Google Play system update date
+      description: |
+        Google Play system update date (e.g. `May 1, 2024`). 
+        **Note**: This is different from Google Play Services, and custom ROMs usually don’t have it. Learn more about it [here](https://support.google.com/product-documentation/answer/14343500?hl=en).
+      placeholder: Enter the Google Play system update date
+    validations:
+      required: false
+
+  - type: input
+    id: security-patch-date
+    attributes:
+      label: Security patch date
+      description: Security patch date (e.g. `June 15, 2024`)
+      placeholder: Enter the security patch date
+    validations:
+      required: true
+
+  - type: input
+    id: grindr-version
+    attributes:
+      label: Grindr version
+      description: Grindr version (e.g. `24.12.0 (127593)`)
+      placeholder: Enter the Grindr version
+    validations:
+      required: true
+
+  - type: dropdown
+    id: grindrplus-version
+    attributes:
+      label: GrindrPlus version
+      description: Please select the version of GrindrPlus you are using.
+      options:
+        - v3.2.1-24.12.0
+        - v3.2.0-24.12.0
+        - v3.1.5-24.9.0
+        - v3.1.4-24.8.0
+        - v3.1.3-24.7.0
+        - v3.1.2-24.4.1
+        - v3.1.1-24.4.0
+        - v3.1.0-24.4.0
+        - v3.0.0-24.3.1
+        - v2.1.4-24.3.0
+        - v2.1.3-24.2.0
+        - v2.1.2-24.2.0
+        - v2.1.1-24.1.0
+        - v2.1.0-24.0.8
+        - v1.4.0-9.18.5
+        - v1.3.8-9.18.2
+        - v1.3.7-9.18.2
+        - v1.3.6-9.18.1
+        - v1.3.5-9.18.1
+        - v1.3.4-9.18.1
+        - v1.3.3-9.18.0
+        - v1.3.2-9.18.0
+        - v1.3.1-9.17.4
+        - v1.2.6-9.16.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        Logs are very useful if they contain necessary straces to debug what's going on. Take logs and grep for `Grindr`, `LSPosed`, `LSPatch` if possible. For more information about how to take logs, check the LineageOS website [here](https://wiki.lineageos.org/how-to/logcat/).
+      render: shell
