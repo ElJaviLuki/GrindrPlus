@@ -1,5 +1,6 @@
 package com.grindrplus.ui.fragments
 
+import Database
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -10,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -18,35 +20,56 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.AppBarLayout
+import com.grindrplus.GrindrPlus
 import com.grindrplus.core.Config
 import com.grindrplus.ui.Utils
 import com.grindrplus.ui.colors.Colors
+import java.io.File
 import kotlin.system.exitProcess
 
 class SettingsFragment : Fragment() {
-
-    private lateinit var importConfigLauncher: ActivityResultLauncher<Intent>
+    private var isDatabaseOperation: Boolean = false
+    private lateinit var importLauncher: ActivityResultLauncher<Intent>
+    private lateinit var exportLauncher: ActivityResultLauncher<Intent>
     private lateinit var subLinearLayout: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        importConfigLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        exportLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.also { uri ->
-                    importConfigFromUri(uri)
+                    if (isDatabaseOperation) {
+                        exportDatabaseToUri(uri)
+                    } else {
+                        exportConfigToUri(uri)
+                    }
                 }
             }
         }
+
+        importLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.also { uri ->
+                    if (isDatabaseOperation) {
+                        importDatabaseFromUri(uri)
+                    } else {
+                        importConfigFromUri(uri)
+                    }
+                }
+            }
+        }
+
     }
 
     override fun onCreateView(
@@ -132,27 +155,41 @@ class SettingsFragment : Fragment() {
 
         toolbar.addView(toolbarTitle)
 
-        toolbar.menu.add(Menu.NONE, 1, Menu.NONE, "Export current config").apply {
+        toolbar.menu.add(Menu.NONE, 1, Menu.NONE, "Export config").apply {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         }
-        toolbar.menu.add(Menu.NONE, 2, Menu.NONE, "Import config from file").apply {
+        toolbar.menu.add(Menu.NONE, 2, Menu.NONE, "Import config").apply {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         }
-        toolbar.menu.add(Menu.NONE, 3, Menu.NONE, "Reset GrindrPlus").apply {
+        toolbar.menu.add(Menu.NONE, 3, Menu.NONE, "Export database").apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        }
+        toolbar.menu.add(Menu.NONE, 4, Menu.NONE, "Import database").apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        }
+        toolbar.menu.add(Menu.NONE, 5, Menu.NONE, "Reset GrindrPlus").apply {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         }
 
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> {
-                    exportConfig()
+                    promptFolderSelection(false)
                     true
                 }
                 2 -> {
-                    promptFileSelection()
+                    promptImportSelection(false)
                     true
                 }
                 3 -> {
+                    promptFolderSelection(true)
+                    true
+                }
+                4 -> {
+                    promptImportSelection(true)
+                    true
+                }
+                5 -> {
                     showResetConfirmationDialog()
                     true
                 }
@@ -173,12 +210,30 @@ class SettingsFragment : Fragment() {
         toolbar.overflowIcon = overflowIcon
     }
 
-    private fun promptFileSelection() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
+    private fun importDatabaseFromUri(uri: Uri) {
+        val context = requireContext()
+        val backupPath = File(context.cacheDir, "grindrplus_backup.db").absolutePath
+        val databasePath = context.filesDir.absolutePath + "/grindrplus.db"
+
+        try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val backupFile = File(backupPath)
+                inputStream.copyTo(backupFile.outputStream())
+
+                val database = Database(context, databasePath)
+                val restored = database.restoreDatabase(backupPath)
+
+                if (restored) {
+                    GrindrPlus.showToast(Toast.LENGTH_LONG, "Database imported successfully!", context)
+                    showImportSuccessDialog()
+                } else {
+                    GrindrPlus.showToast(Toast.LENGTH_LONG, "Failed to restore database!", context)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            GrindrPlus.showToast(Toast.LENGTH_LONG, "Failed to import database!", context)
         }
-        importConfigLauncher.launch(intent)
     }
 
     private fun importConfigFromUri(uri: Uri) {
@@ -188,22 +243,91 @@ class SettingsFragment : Fragment() {
                 val configJson = inputStream.bufferedReader().use { it.readText() }
                 Config.importFromJson(configJson)
                 updateUIFromConfig()
+                GrindrPlus.showToast(Toast.LENGTH_LONG, "Config imported successfully!", context)
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            GrindrPlus.showToast(Toast.LENGTH_LONG, "Failed to import config!", context)
         }
     }
 
-    private fun exportConfig() {
+    private fun showImportSuccessDialog() {
+        val context = requireContext()
+        AlertDialog.Builder(context)
+            .setTitle("Database Import")
+            .setMessage("The database has been successfully imported. The app will now close to apply the changes.")
+            .setPositiveButton("OK") { _, _ ->
+                closeApp()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun promptImportSelection(isDatabase: Boolean) {
+        isDatabaseOperation = isDatabase
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            if (isDatabase) {
+                type = "*/*"
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/octet-stream", "application/x-sqlite3", "application/vnd.sqlite3", "application/db", "*/*"))
+            } else {
+                type = "application/json"
+            }
+        }
+        importLauncher.launch(intent)
+    }
+
+    private fun promptFolderSelection(isDatabase: Boolean) {
+        isDatabaseOperation = isDatabase
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        exportLauncher.launch(intent)
+    }
+
+    private fun exportDatabaseToUri(uri: Uri) {
+        val context = requireContext()
+        val databasePath = context.filesDir.absolutePath + "/grindrplus.db"
+
+        val databaseFile = File(databasePath)
+        val contentResolver = context.contentResolver
+
+        try {
+            val pickedDir = DocumentFile.fromTreeUri(context, uri)
+
+            val newFile = pickedDir?.createFile("application/x-sqlite3", "grindrplus_backup.db")
+            newFile?.uri?.let { exportUri ->
+                contentResolver.openOutputStream(exportUri)?.use { outputStream ->
+                    databaseFile.inputStream().use { inputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                    GrindrPlus.showToast(Toast.LENGTH_LONG, "Database exported successfully!", requireContext())
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            GrindrPlus.showToast(Toast.LENGTH_LONG, "Failed to export database!", requireContext())
+        }
+    }
+
+    private fun exportConfigToUri(uri: Uri) {
+        val context = requireContext()
         val configJson = Config.getConfigJson()
 
-        val shareIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, configJson)
-        }
+        val contentResolver = context.contentResolver
 
-        startActivity(Intent.createChooser(shareIntent, "Share config"))
+        try {
+            val pickedDir = DocumentFile.fromTreeUri(context, uri)
+
+            val configFile = pickedDir?.createFile("application/json", "grindrplus_config.json")
+            configFile?.uri?.let { exportUri ->
+                contentResolver.openOutputStream(exportUri)?.use { outputStream ->
+                    outputStream.write(configJson.toByteArray())
+                    GrindrPlus.showToast(Toast.LENGTH_LONG, "Config exported successfully!", context)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            GrindrPlus.showToast(Toast.LENGTH_LONG, "Failed to export config!", context)
+        }
     }
 
     private fun updateUIFromConfig() {
@@ -275,6 +399,10 @@ class SettingsFragment : Fragment() {
 
     private fun resetConfigAndCloseApp() {
         Config.resetConfig(true)
+        closeApp()
+    }
+
+    fun closeApp() {
         val activity = requireActivity()
         activity.finishAffinity()
         exitProcess(0)

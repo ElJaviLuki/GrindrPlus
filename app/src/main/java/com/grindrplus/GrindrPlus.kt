@@ -104,8 +104,11 @@ object GrindrPlus {
         hookManager.init()
     }
 
-    fun runOnMainThread(block: Runnable) {
-        Handler(context.mainLooper).post(block)
+    fun runOnMainThread(appContext: Context? = null, block: (Context) -> Unit) {
+        val useContext = appContext ?: context
+        Handler(useContext.mainLooper).post {
+            block(useContext)
+        }
     }
 
     fun runOnMainThreadWithCurrentActivity(block: (Activity) -> Unit) {
@@ -116,9 +119,10 @@ object GrindrPlus {
         }
     }
 
-    fun showToast(duration: Int, message: String) {
-        runOnMainThread {
-            Toast.makeText(context, message, duration).show()
+    fun showToast(duration: Int, message: String, appContext: Context? = null) {
+        val useContext = appContext ?: context
+        runOnMainThread(useContext) {
+            Toast.makeText(useContext, message, duration).show()
         }
     }
 

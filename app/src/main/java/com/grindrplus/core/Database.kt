@@ -262,6 +262,33 @@ class Database(context: Context, databasePath: String?) : SQLiteOpenHelper(
         }
     }
 
+    fun restoreDatabase(backupPath: String): Boolean {
+        synchronized(lock) {
+            val dbFile = File(writableDatabase.path)
+            val backupFile = File(backupPath)
+
+            if (!backupFile.exists()) {
+                return false
+            }
+
+            writableDatabase.close()
+
+            return try {
+                backupFile.inputStream().use { input ->
+                    dbFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            } finally {
+                writableDatabase
+            }
+        }
+    }
+
     private val tables = listOf(
         Table(
             name = "ExpiringPhotos",
