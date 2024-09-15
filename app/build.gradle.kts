@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 
 plugins {
@@ -13,11 +14,12 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        val gitCommitHash = getGitCommitHash() ?: "unknown"
         applicationId = "com.grindrplus"
         minSdk = 21
         targetSdk = 34
         versionCode = 14
-        versionName = "3.2.1-$grindrVersion"
+        versionName = "3.2.1-$grindrVersion ($gitCommitHash)"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -25,6 +27,7 @@ android {
             useSupportLibrary = true
         }
 
+        buildConfigField("String", "COMMIT_HASH", "\"$gitCommitHash\"")
         buildConfigField("String", "TARGET_GRINDR_VERSION", "\"$grindrVersion\"")
     }
 
@@ -59,6 +62,7 @@ android {
 
     android.applicationVariants.configureEach {
         outputs.configureEach {
+            val gitCommitHash = getGitCommitHash() ?: "unknown"
             (this as BaseVariantOutputImpl).outputFileName = "GPlus_v${versionName}-${name}.apk"
         }
     }
@@ -76,4 +80,21 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     compileOnly(fileTree("libs") { include("*.jar") })
+}
+
+fun getGitCommitHash(): String? {
+    return try {
+        if (exec { commandLine = "git rev-parse --is-inside-work-tree".split(" ") }.exitValue == 0) {
+            val output = ByteArrayOutputStream()
+            exec {
+                commandLine = "git rev-parse --short HEAD".split(" ")
+                standardOutput = output
+            }
+            output.toString().trim()
+        } else {
+            null
+        }
+    } catch (e: Exception) {
+        null
+    }
 }
