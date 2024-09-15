@@ -98,3 +98,10 @@ fun getGitCommitHash(): String? {
         null
     }
 }
+
+tasks.register("printVersionInfo") {
+    doLast {
+        val versionName = android.defaultConfig.versionName
+        println("VERSION_INFO: GrindrPlus v$versionName")
+    }
+}
