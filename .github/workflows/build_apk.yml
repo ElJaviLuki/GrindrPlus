@@ -52,6 +52,25 @@ jobs:
           echo "DEBUG_APK=$DEBUG_APK" >> $GITHUB_ENV
           echo "RELEASE_APK=$RELEASE_APK" >> $GITHUB_ENV
 
+      - name: Decode and Save Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/keystore.jks
+
+      - name: Sign the Release APK
+        run: |
+          ${ANDROID_HOME}/build-tools/$(ls "${ANDROID_HOME}/build-tools/" | sort -V | tail -n 1)/apksigner sign \
+          --ks /tmp/keystore.jks \
+          --ks-key-alias ${{ secrets.KEY_ALIAS }} \
+          --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+          --out "${{ env.RELEASE_APK }}" \
+          "${{ env.RELEASE_APK }}"
+
+      - name: Verify the signed APK
+        run: |
+          ${ANDROID_HOME}/build-tools/$(ls "${ANDROID_HOME}/build-tools/" | sort -V | tail -n 1)/apksigner verify \
+          "${{ env.RELEASE_APK }}"
+
       - name: Upload Debug APK to Telegram
         run: |
           curl -F document=@"${{ env.DEBUG_APK }}" \
@@ -60,7 +79,7 @@ jobs:
           -F caption="${{ env.VERSION_INFO }} (debug) | [${{ env.COMMIT_SHA }}](${{ env.COMMIT_URL }})" \
           https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument
 
-      - name: Upload Release APK to Telegram
+      - name: Upload Signed Release APK to Telegram
         run: |
           curl -F document=@"${{ env.RELEASE_APK }}" \
           -F chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
@@ -74,8 +93,8 @@ jobs:
           name: "Debug APK - ${{ env.DATE_TODAY }}"
           path: ${{ env.DEBUG_APK }}
 
-      - name: Upload Release APK as Artifact
+      - name: Upload Signed Release APK as Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: "Release APK - ${{ env.DATE_TODAY }}"
-          path: ${{ env.RELEASE_APK }}
+          name: "Signed Release APK - ${{ env.DATE_TODAY }}"
+          path: "${{ env.RELEASE_APK }}"
