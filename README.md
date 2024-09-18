@@ -2,84 +2,208 @@
   <img src="gplus_icon.svg" alt="Grindr Plus Icon" width="150" height="150">
 </p>
 
-<h1 align="center">Grindr Plus</h1>
 <p align="center">
-  <a href="https://discord.gg/SPb6Kc7S4C">
-    <img src="https://img.shields.io/discord/1161706617729974352?label=Discord&logo=discord&style=for-the-badge" alt="Discord">
-  </a>
+  <a href="https://github.com/ElJaviLuki/GrindrPlus/actions/workflows/build_apk.yml?query=branch%3Amaster+event%3Apush+is%3Acompleted"><img src="https://img.shields.io/github/actions/workflow/status/ElJaviLuki/GrindrPlus/build_apk.yml?branch=master&logo=github&label=Build" alt="Build"></a>
+  <img src="https://shields.io/github/downloads/ElJaviLuki/GrindrPlus/total?logo=Bookmeter&label=Downloads&logoColor=Green&color=Green" alt="Total downloads">
+  <a href="https://discord.gg/SPb6Kc7S4C"><img src="https://img.shields.io/discord/1161706617729974352?label=Discord&logo=discord" alt="Discord"></a>
 </p>
-Grindr Plus is a Xposed Module that allows you to unlock some features in Grindr.
+<h1 align="center">Grindr Plus</h1>
 
-## Extra features
-(Depending on the version of the client and module you're using, some features may not be available or may work buggy.)
-- Allow mocking locations.
-- Grant most of the Xtra and Unlimited features.
-  -   Unlimited cascade view.
-  -   Unlocked 'Explore mode'.
-  -   Advanced search filters.
-  -   See 'Read' and 'Typing...' message states.
-- Allow taking screenshots in any part of the app (including albums and expiring photos).
-- Unlimited expiring photos.
-- Remove expiration on incoming expiring photos, allowing to see them any number of times you want.
-- Extra profile fields in the so-called CruiseViewHolder
-    -   Body mass index (BMI) and its description (underweight, normal, overweight, obesity I, obesity II or obesity III), if both weight and height are available.
-- Make videocalls even if you didn't start a chat with the recipient.
-- Access to some user-hidden features (developer features)
-- More accurate online status from other users. (The green dot from other profiles goes off after 3 minutes of inactivity.)
-- Allow unlimited taps (no 24h restriction)
-- Ability to see who viewed your profile even if you have "Show Me In Viewed Me List" disabled.
-- Ability to remove messages from anyone, any time.
-- Block app (forced) updates. (The latest version of Grindr will be always fetched and spoofed internally).
-- Execute commands in any chat to perform various actions:
-    - Use `/teleport` to (virtually) travel to any location by specifying an alias, its name, or coordinates.
-    - Retrieve the profile ID of the person you're chatting by using `/id`.
-    - Find out your own profile ID with `/myId`.
-    - Access any profile directly by its ID using `/open`.
-    - Switch the profile redesign on or off with `/redesign`.
-    - Choose whether to appear in the view list or remain hidden using `/views`.
-    - Discover more functionalities with `/help`, which provides a comprehensive list of available commands.
+<p align="center">
+Grindr Plus is an Xposed Module that unlocks and adds unique features to the Grindr app, enhancing user experience.
+</p>
+
+## Introduction
+This Grindr mod adds new features, ensures compatibility with the latest Grindr versions, and offers improved performance and functionality.
+
+As the title of the repo suggests, this mod is designed to enhance the user experience, but please note that it’s under active development, so stability is not always guaranteed.
+
+No contributors listed here are affiliated with Grindr LLC.
+
+Use this mod at your own discretion, and be aware that future updates may introduce changes or require further adjustments.
+
+## Disclaimer
+This mod is provided for free with no warranty of any kind. Use at your own risk! We are not responsible for lost chats, user data, unexpected bans or any other problems incurred from the use of this module.
+
+This mod does not collect any personal data nor does it display ads of any kind. No earnings are generated or collected from the use of this software. This project is open source so you can check all these facts by your own!
+
+## Downloads
+* You can download the latest stable release by visiting the [releases page](https://github.com/ElJaviLuki/GrindrPlus/releases).
+* You can grab the most recent CI build from the [actions section](https://github.com/ElJaviLuki/GrindrPlus/actions) or join our [Telegram CI channel](https://t.me/GrindrPlus).
+
+## Features
+<details closed>
+  <summary>Chat</summary>
+
+- `Built-in command console (see /help)`
+- `Start video calls in new chats`
+- `Prevent others from seeing chat indicators`
+- `Remove any message, no matter how old it is`
+</details>
+
+<details closed>
+  <summary>Media</summary>
+
+- `Unlimited expiring photos`
+- `View all albums you've received`
+- `Ability to take screenshots`
+</details>
+
+<details closed>
+  <summary>Global</summary>
+
+- `Removed most analytics`
+- `Unlock developer special features`
+- `Built-in mod settings to manage hooks`
+- `Disable forced app updates (extend mod lifespan)`
+</details>
+
+<details closed>
+  <summary>Profiles</summary>
+
+- `Body mass index (BMI)`
+- `Indicator for boosted users`
+- `Ability to copy profile ID`
+- `More accurate distance`
+- `Hidden (server) profile fields`
+- `More accurate online status`
+- `Customize favorites layout`
+</details>
+
+<details closed>
+  <summary>Location</summary>
+
+- `Quick teleporting`
+- `Location spoofing`
+- `Save and manage locations`
+</details>
+
+<details closed>
+  <summary>Premium</summary>
+
+- `Unlimited cascade view`
+- `Unlocked "Explore Mode"`
+- `Advanced search filters`
+- `ZERO third-party ads`
+- `Saved chat phrases`
+- `Disable boosting upsells`
+- `Hide your own views`
+- `Incognito mode`
+</details>
 
 ## Bugs
-* Incognito mode is kinda buggy (it turns off after a little while)
+* Incognito mode is kinda buggy (it turns off after a little while).
+* GMS-related features (e.g. Google Login, "Explore" mode map) are broken with LSPatch.
 
-## How to install
-Each Grindr Plus release supports only a specific Grindr app version and quite possibly will not work with any other. Before installing Grindr Plus, some prep work is needed to make sure that you are currenly running and will remain on a supported Grindr version.
+## Installation
+> <small>[!WARNING]
+> _Each Grindr Plus release supports only a specific Grindr app version and quite possibly will not work with any other.</small>_
 
-### Prep work
-1. Install an Xposed framework and its management app. (See: Xposed, EdXposed, LSPosed, etc.)
-2. If you use Play Store auto update (most likely), disable auto update for the Grindr app:
-   - Go to the Play Store and open the Grindr app page.
-   - Click on the 3 dots (overflow menu) and untick "enable auto update".
-3. Go to Grindr Plus [releases](https://github.com/R0rt1z2/GrindrPlus/releases) and pick the latest. Each Grindr Plus release specifies its compatible Grindr app version on its filename. Take note of the required Grindr app version.
-4. Check the Grindr version currently installed on your device.
-   - If it matches the required version, you are ready to install Plus.
-   - If it is older than the required version, go to [APKMirror](https://www.apkmirror.com/apk/grindr-llc/grindr-gay-chat-meet-date/) and download and install the required version. Check that Grindr works before proceeding.
-   - If your version is newer than the required version, you have 2 options:
-     - Wait for the Grindr Plus dev to maybe release a newer Plus. In the meantime, your Grindr will continue to work but will not auto update.
-     - Downgrade your Grindr. You are likely rooted, so maybe you have a recent local app backup to restore. Or you can take a backup, install the older version, and restore only the app data afterwards (which might or might not explode in your face). Or you can simply do a clean install of the older version. Consider backing up messages using the Grindr backup service before uninstalling. And you might want to take a local app backup too, just in case. **However you downgrade Grindr, you probably need to immediately disable Play Store auto update again afterwards.** And double-check that Grindr works before continuing.
+GrindrPlus supports both **LSPosed** and **LSPatch**, though the latter comes with additional bugs, which are documented in the bugs section.
 
-### Plus installation
-1. Download your chosen Grindr Plus release and install it.
-2. Activate the module in your Xposed manager.
-3. Reboot your device.
+Each installation method is completely different and comes with its own challenges, so make sure to read the guide carefully and thoroughly. Open the dropdown for the method you plan to use to continue with the installation.
 
-## Troubleshooting
-### My Grindr app suddenly stops when the module is installed.
-Check if the module supports the app version. Grindr has lots of obfuscated symbols that change in each app update and the module couldn't work (or couldn't work properly)
+<details closed>
+  <summary>LSPatch</summary>
+
+> This is a simplified version of [willysmith's XDA guide](https://xdaforums.com/t/mod-xposed-grindr-plus.4461857/page-107#post-89708211). Visit the link to read the complete (and more detailed) guide!
+
+**Requirements:**
+- `Shizuku` [**installed**](https://shizuku.rikka.app/guide/setup) and fully functional
+
+**Process:**
+1. Download [JingMatrix's LSPatch fork](https://xdaforums.com/attachments/lspatch-manager-v0-6-418-release-apk.6143894) and install it (as of September 2024, official LSPatch doesn't work anymore with latest Android versions)
+2. Install the GrindrPlus module APK (check the [downloads](https://github.com/ElJaviLuki/GrindrPlus?tab=readme-ov-file#downloads) section of this `README`)
+3. Download the latest Grindr app [from Play Store](https://play.google.com/store/apps/details?id=com.grindrapp.android&hl=en) or use [SAI](https://github.com/Aefyr/SAI/releases) to install [bundles from APKMirror](https://www.apkmirror.com/apk/grindr-llc/grindr-gay-chat-meet-date/)
+4. Open `LSPatch` to make sure everything is set up correctly up to this point. In the **home tab**, confirm you see _Shizuku service available_ at the very top
+5. From `LSPatch`, go to "Manage > Apps" and press **+**. Create new patch, select an installed app and search for the Grindr app (`com.grindrapp.android`)
+6. Enable (select) the options **LOCAL** and **ENABLE DEBUGGING**, start the patch and wait for it to finish
+7. Once it's done, click on install. It'll ask to uninstall the original Grindr app, just do it and wait for it to install the patched APK
+8. Go back to "Manage > Apps", click on "Grindr > Module scope" and select Grindr Plus (`com.grindrplus`), confirm by pressing the checkmark (bottom right)
+9. Open Grindr and check if Mod Settings are at the top of Grindr settings
+</details>
+
+<details closed>
+  <summary>LSPosed</summary>
+
+> If you're using the official LSPosed, the mod might not work. **It is highly recommended to switch to [JingMatrix's fork of LSPosed](https://xdaforums.com/t/mod-xposed-grindr-plus.4461857/page-105#post-89706407)!**
+
+**Requirements:**
+- Rooted using `Magisk` or `KernelSU`
+- `LSPosed` installed and fully functional
+
+**Process:**
+1. Install the GrindrPlus module APK (check the [downloads](https://github.com/ElJaviLuki/GrindrPlus?tab=readme-ov-file#downloads) section of this `README`)
+2. Download the latest Grindr app [from Play Store](https://play.google.com/store/apps/details?id=com.grindrapp.android&hl=en) or use [SAI](https://github.com/Aefyr/SAI/releases) to install [bundles from APKMirror](https://www.apkmirror.com/apk/grindr-llc/grindr-gay-chat-meet-date/)
+3. Turn on the module in `LSPosed` and make sure Grindr is in scope
+4. Open Grindr and check if Mod Settings are at the top of Grindr settings
+</details>
+
+## FAQ & Troubleshooting
+<details>
+  <summary>My Grindr app suddenly stops / crashes when the module is installed!</summary> 
+
+- Make sure you're using a good LSPatch/LSPosed version (official are broken on latest Android versions). Consider switching to [JingMatrix's fork](https://github.com/JingMatrix) if you haven't already.
+- Check if the module supports the app version. Grindr has lots of obfuscated symbols that change in each app update and the module couldn't work (or couldn't work properly).
+</details>
+<details>
+  <summary>I've updated to newer Android version and LSPosed/LSPatch stopped working!</summary> 
+
+- The development of LSPosed/LSPatch is currently frozen and that is why, no new updates have been released to support new Android versions. Make sure you're using [JingMatrix's fork](https://github.com/JingMatrix), which works with latest updates.
+</details>
+<details>
+  <summary>I can't see profiles, whenever I open them they're blank!</summary>
+
+- This most likely means you're using an AdBlocker (e.g. AdAway). Disable it or whitelist `cdn.cookielaw.org`.
+
+</details>
+<details>
+  <summary>I'm using LSPatch and I can't login with Google!</summary> 
+
+- As mentioned above, when using LSPatch the original signature of the application is invalidated which causes all functions related to Google Services (GMS) to not work properly.
+</details>
+<details>
+  <summary>Can I get banned with this?</summary>
+
+- [Obviously](https://www.grindr.com/terms-of-service), however, the risk is very low, and there have been no reported cases of bans related to using this mod.
+</details>
+<details>
+  <summary>Where can I download the latest stable build?</summary>
+
+- https://github.com/ElJaviLuki/GrindrPlus/releases
+</details>
+<details>
+  <summary>Can I suggest a new feature?</summary>
+
+- Feel free to, but keep in mind that every feature, no matter how small, has a lot of work behind it, so please be patient and understand that sometimes it is impossible to implement certain things due to the nature of how LSPosed works.
+- Make sure to use our feature requests template, otherwise your inquiry will be ignored.
+</details>
+
+<details>
+  <summary>I'm having issues on GrapheneOS!</summary>
+
+- Uninstall Google Play "trio" (framework, services, store) in "apps" app and reinstall them again. They break all the time so it's a good idea to reload them. Don't worry, you won't have to login again to Google.
+- Make sure to turn **ON** the exploit protection compatibility mode in "App Info" of Grindr, GrindrPlus and Google Play "trio". Just tap and hold onto the app icon to go there. When it comes to Google services you can do so from "apps" app.
+- While doing the step above make sure to give Google Play services permissions to access location all the time and sensors.
+- In Settings -> Apps -> Sandboxed Google Play, turn off the option "Reroute location requests to OS".
+
+</details>
+
+## Acknowledgments
+This project relies on several third-party libraries, and we extend our gratitude to their authors for their valuable contributions. For a complete list of these dependencies, please refer to the [dependencies](https://github.com/ElJaviLuki/GrindrPlus/blob/master/app/build.gradle.kts#L67-L79) section of the `build.gradle.kts` file.
+
+I would also like to give special recognition to [@rhunk](https://github.com/rhunk) and the other developers of [SE](https://github.com/rhunk/SnapEnhance). Their work has been very useful for this mod, and some portions of their code have been used here.
 
 ## Contributing
 This project is open to any kind of contribution. Feel free to [open a pull request](https://github.com/ElJaviLuki/GrindrPlus/pulls) or [submit an issue](https://github.com/ElJaviLuki/GrindrPlus/issues)! [Discussions section](https://github.com/ElJaviLuki/GrindrPlus/discussions) also available!
 
-## Interesting links
-- [XDA Official Thread](https://forum.xda-developers.com/t/mod-xposed-new-grindr-plus.4461857/#post-87076193)
+## Related resources
+- [Official XDA thread](https://forum.xda-developers.com/t/mod-xposed-new-grindr-plus.4461857/#post-87076193)
+- [Downloads for Grindr (APKMirror)](https://www.apkmirror.com/apk/grindr-llc/grindr-gay-chat-meet-date)
+- [JingMatrix's LSPosed fork](https://github.com/JingMatrix/LSPosed)
+- [JingMatrix's LSPatch fork](https://github.com/JingMatrix/LSPatch)
 
-## Disclaimer
-This module is neither affiliated with nor endorsed by the official Grindr app. It is provided for free with no warranty of any kind. Use at your own risk! I am not responsible for lost chats, user data, unexpected bans or any other problems incurred from the use of this module. This mod does not collect any personal data nor does it display ads of any kind. No earnings are generated or collected from the use of this software. This project is open source so you can check all these facts by your own!
+## License
+This project is distributed under the GPL-3.0 License. For more information, simply refer to the [LICENSE](https://github.com/ElJaviLuki/GrindrPlus/blob/master/LICENSE) file.
 
-## Credits
-As an open source project, you're free to inspire yourself from this code. However, please **DON'T copy it and release it as your own (kanging)**. Give the proper credit and reference to the original project (https://github.com/ElJaviLuki/GrindrPlus) and its contributors.
-
-Main contributor: [@ElJaviLuki](https://github.com/ElJaviLuki)
-
-Additional credits to:
-- [@veeti](https://github.com/veeti) for [DisableFlagSecure](https://github.com/veeti/DisableFlagSecure)
+As an open source project, you're free to inspire yourself from this code. However, please **DON'T copy it and release it as your own (kanging)**. Give the proper credit and reference to the [original project](https://github.com/ElJaviLuki/GrindrPlus) and its [contributors](https://github.com/ElJaviLuki/GrindrPlus/graphs/contributors).

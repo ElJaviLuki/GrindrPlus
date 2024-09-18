@@ -1,86 +1,121 @@
 package com.grindrplus.core
 
+import android.content.Context
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
-class Config(private val configFilePath: String) {
+object Config {
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+    private val scope = CoroutineScope(newSingleThreadContext("Config"))
+    private lateinit var configFile: File
+    private lateinit var config: JSONObject
 
-    private val defaultConfig = JSONObject().apply {
-        put("profile_redesign", true)
-        put("dont_record_views", true)
-        put("teleport_enabled", false)
-        put("show_profile_details", true)
-    }
-
-    private fun getConfigFile(): File {
-        val configFile = File(configFilePath)
-        if (!configFile.exists() || configFile.readText().isEmpty()) {
-            configFile.createNewFile()
-            configFile.writeText(defaultConfig.toString())
+    fun initialize(context: Context) {
+        configFile = File(context.filesDir, "grindrplus.json")
+        if (!configFile.exists()) {
+            try {
+                configFile.createNewFile()
+                val initialConfig = JSONObject().put("hooks", JSONObject())
+                writeConfig(initialConfig)
+            } catch (e: IOException) {
+                Log.e("GrindrPlus", "Failed to create config file", e)
+            }
         }
-        return configFile
+        config = readConfig(configFile)
     }
 
-    private fun readConfig(): JSONObject {
-        return JSONObject(getConfigFile().readText())
-    }
-
-    fun readString(key: String, defaultValue: String): String {
-        return readConfig().optString(key, defaultValue)
-    }
-
-    fun readBoolean(key: String, defaultValue: Boolean): Boolean {
-        return readConfig().optBoolean(key, defaultValue)
-    }
-
-    fun readInt(key: String, defaultValue: Int): Int {
-        return readConfig().optInt(key, defaultValue)
-    }
-
-    fun writeConfig(key: String, value: Any) {
-        try {
-            val jsonObject = readConfig()
-            jsonObject.put(key, value)
-            getConfigFile().writeText(
-                jsonObject.toString())
+    private fun readConfig(file: File): JSONObject {
+        return try {
+            JSONObject(file.readText())
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("GrindrPlus", "Error reading config file", e)
+            JSONObject().put("hooks", JSONObject())
         }
     }
 
-    fun readMap(key: String): JSONObject {
-        return readConfig().optJSONObject(key) ?: JSONObject()
-    }
-
-    fun writeMap(key: String, map: JSONObject) {
-        writeConfig(key, map)
-    }
-
-    fun updateMapEntry(mapKey: String, entryKey: String,
-                       value: JSONObject) {
-        val map = readMap(mapKey)
-        map.put(entryKey, value)
-        writeMap(mapKey, map)
-    }
-
-    fun removeMapEntry(mapKey: String, entryKey: String) {
-        val map = readMap(mapKey)
-        map.remove(entryKey)
-        writeMap(mapKey, map)
-    }
-
-    fun addToMap(name: String, key: String, value: Any) {
+    private fun writeConfig(json: JSONObject) {
         try {
-            val configFile = getConfigFile()
-            val jsonObject = readConfig()
-            val targetMap = jsonObject
-                .optJSONObject(name) ?: JSONObject()
-            targetMap.put(key, value)
-            jsonObject.put(name, targetMap)
-            configFile.writeText(jsonObject.toString())
+            FileOutputStream(configFile).use { fos ->
+                fos.write(json.toString(4).toByteArray(Charsets.UTF_8))
+            }
+        } catch (e: IOException) {
+            Log.e("GrindrPlus", "Failed to write config file", e)
         }
-        catch (e: Exception) {
-            e.printStackTrace()
+    }
+
+    fun resetConfig(shouldResetDb: Boolean = false) {
+        config = JSONObject().put("hooks", JSONObject())
+        if (shouldResetDb) {
+            config.put("reset_database", true)
         }
+        scope.launch { writeConfig(config) }
+    }
+
+    fun importFromJson(jsonString: String) {
+        try {
+            val newConfig = JSONObject(jsonString)
+            config = newConfig
+            scope.launch { writeConfig(newConfig) }
+        } catch (e: Exception) {
+            Log.e("GrindrPlus", "Failed to import config", e)
+        }
+    }
+
+    fun put(name: String, value: Any) {
+        config.put(name, value)
+        scope.launch { writeConfig(config) }
+    }
+
+    fun get(name: String, default: Any): Any {
+        return config.opt(name) ?: default
+    }
+
+    fun getConfigJson(): String {
+        return config.toString(4)
+    }
+
+    fun setHookEnabled(hookName: String, enabled: Boolean) {
+        val hooks = config.optJSONObject("hooks") ?: JSONObject().also { config.put("hooks", it) }
+        hooks.optJSONObject(hookName)?.put("enabled", enabled)
+        scope.launch { writeConfig(config) }
+    }
+
+    fun isHookEnabled(hookName: String): Boolean {
+        val hooks = config.optJSONObject("hooks") ?: return false
+        return hooks.optJSONObject(hookName)?.getBoolean("enabled") ?: false
+    }
+
+    fun initHookSettings(name: String, description: String, state: Boolean) {
+        if (config.optJSONObject("hooks")?.optJSONObject(name) == null) {
+            val hooks =
+                config.optJSONObject("hooks") ?: JSONObject().also { config.put("hooks", it) }
+            hooks.put(name, JSONObject().apply {
+                put("description", description)
+                put("enabled", state)
+            })
+            writeConfig(config)
+        }
+    }
+
+    fun getHooksSettings(): Map<String, Pair<String, Boolean>> {
+        val hooks = config.optJSONObject("hooks") ?: return emptyMap()
+        val map = mutableMapOf<String, Pair<String, Boolean>>()
+
+        val keys = hooks.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            val obj = hooks.getJSONObject(key)
+            map[key] = Pair(obj.getString("description"), obj.getBoolean("enabled"))
+        }
+
+        return map
     }
 }
