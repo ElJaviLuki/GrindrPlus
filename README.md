@@ -13,6 +13,8 @@
 Grindr Plus is an Xposed Module that unlocks and adds unique features to the Grindr app, enhancing user experience.
 </p>
 
+> ⚠️⚠️⚠️ I no longer work on this project as actively as before, and it is open to any kind of contributions. If you’d like more frequent updates, I recommend checking out R0rt1z2’s fork: https://github.com/R0rt1z2/GrindrPlus ⚠️⚠️⚠️
+
 ## Introduction
 This Grindr mod adds new features, ensures compatibility with the latest Grindr versions, and offers improved performance and functionality.
 
